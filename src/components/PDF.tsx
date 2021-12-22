@@ -118,15 +118,11 @@ const fipeDefault: FIPE = {
 };
 
 const pdfDefault = {
-  accession: false,
   admin: "",
   cotas: 0,
   discount: 0,
-  inspection: true,
-  installation: true,
   name: "",
   phone: "",
-  theft: true,
   total: "",
 };
 
@@ -135,10 +131,7 @@ const PDF = () => {
   const [pdf] = useLocalStorage("pdf", pdfDefault);
 
   const proposal1 = numero.porExtenso(currencyToNumber(pdf.total), "monetario");
-  const proposal2 = numero.porExtenso(
-    currencyToNumber(pdf.total) - 200,
-    "monetario"
-  );
+  const proposal2 = numero.porExtenso(currencyToNumber(pdf.total) - 200, "monetario");
   const proposal3 = numero.porExtenso(1020, "monetario");
   const others = numero.porExtenso(300, "monetario");
   const value = numero.porExtenso(120, "monetario");
@@ -148,18 +141,13 @@ const PDF = () => {
       <PDFViewer width="100%" height="100%">
         <Document>
           <Page size="A4" style={styles.page}>
-            <View></View>
-          </Page>
-          <Page size="A4" style={styles.page}>
             <View id="container" style={styles.container}>
               <Image src="/images/logo.png" style={styles.image} />
               <View id="date" style={styles.date}>
                 <Text>Fortaleza, {dateLong} </Text>
               </View>
               <View id="title">
-                <Text style={styles.title}>
-                  Proposta Comercial - Proteção Veicular
-                </Text>
+                <Text style={styles.title}>Proposta Comercial - Proteção Veicular</Text>
               </View>
               <View id="descriptions" style={styles.descriptions}>
                 <View id="contract" style={styles.row}>
@@ -168,30 +156,19 @@ const PDF = () => {
                     Sr(a). {pdf.name} - {pdf.phone}
                   </Text>
                 </View>
-                <Text style={[styles.bold]}>
-                  Prezado, segue abaixo nossa proposta:
-                </Text>
+                <Text style={[styles.bold]}>Prezado, segue abaixo nossa proposta:</Text>
               </View>
               <View id="vehicles" style={{ paddingVertical: 10 }}>
                 <View id="model" style={[styles.row, styles.background]}>
                   <Text style={[styles.bold]}>Veículo: </Text>
                   <Text>{`${fipe.Marca} ${fipe.Modelo} ${fipe.AnoModelo}`}</Text>
                 </View>
-                <View
-                  style={[
-                    styles.row,
-                    styles.background,
-                    { alignSelf: "center" },
-                  ]}
-                >
+                <View style={[styles.row, styles.background, { alignSelf: "center" }]}>
                   <Text style={styles.bold}>Fipe: </Text>
                   <Text>{fipe.Valor}</Text>
                 </View>
               </View>
-              <View
-                id="subtitle"
-                style={{ paddingVertical: 10, alignSelf: "flex-start" }}
-              >
+              <View id="subtitle" style={{ paddingVertical: 10, alignSelf: "flex-start" }}>
                 <Text style={[styles.bold, styles.subtitle]}>
                   Proposta 1 - Proteção Veicular Completa
                 </Text>
@@ -199,7 +176,7 @@ const PDF = () => {
               <View id="services" style={[styles.bold, styles.content]}>
                 <Text>Proteção contra acidente</Text>
                 <Text>Proteção contra incêndio</Text>
-                {pdf.theft ? <Text>Proteção contra roubo e furto</Text> : <></>}
+                <Text>Proteção contra roubo e furto</Text>
                 <Text>Diesel S10 a preço de custo</Text>
                 <Text>Destombamento de veículo em caso de acidente</Text>
                 <Text>Auxílio guincho com 300 km</Text>
@@ -216,10 +193,7 @@ const PDF = () => {
                     {currencyBRL(currencyToNumber(pdf.admin) + 200)}
                   </Text>
                   {pdf.discount > 0 ? (
-                    <Text>
-                      (Aplicado {pdf.discount}% de desconto na taxa
-                      administrativa)
-                    </Text>
+                    <Text>(Aplicado {pdf.discount}% de desconto na taxa administrativa)</Text>
                   ) : (
                     <></>
                   )}
@@ -244,10 +218,7 @@ const PDF = () => {
                   {currencyBRL(currencyToNumber(pdf.admin) + 200)}
                 </Text>
                 {pdf.discount > 0 ? (
-                  <Text>
-                    (Aplicado {pdf.discount}% de desconto na taxa
-                    administrativa)
-                  </Text>
+                  <Text>(Aplicado {pdf.discount}% de desconto na taxa administrativa)</Text>
                 ) : (
                   <></>
                 )}
@@ -262,8 +233,8 @@ const PDF = () => {
               <View style={[styles.line, { marginTop: 90 }]}></View>
               <View style={styles.footer}>
                 <Text>
-                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ
-                  nº 12.460.490/0002-79
+                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ nº
+                  12.460.490/0002-79
                 </Text>
               </View>
             </View>
@@ -271,10 +242,7 @@ const PDF = () => {
           <Page size="A4" style={styles.page}>
             <View id="container" style={styles.container}>
               <Image src="/images/logo.png" style={styles.image} />
-              <View
-                id="subtitle"
-                style={{ paddingVertical: 10, alignSelf: "flex-start" }}
-              >
+              <View id="subtitle" style={{ paddingVertical: 10, alignSelf: "flex-start" }}>
                 <Text style={[styles.bold, styles.subtitle]}>
                   Proposta 2 - Proteção Veicular para Acidente e Incêndio
                 </Text>
@@ -294,10 +262,7 @@ const PDF = () => {
                   <Text style={styles.bold}>Adesão (Já incluso 1º mês)</Text>
                   <Text>Taxa de adesão: R$ 600,00</Text>
                   <Text>Taxa administrativa: {pdf.admin}</Text>
-                  <Text>
-                    (Aplicado {pdf.discount}% de desconto na taxa
-                    administrativa)
-                  </Text>
+                  <Text>(Aplicado {pdf.discount}% de desconto na taxa administrativa)</Text>
                   <Text>Instalação do equipamento: R$ 170,00</Text>
                   <Text>Vistoria: R$ 50,00</Text>
                 </View>
@@ -305,8 +270,7 @@ const PDF = () => {
               <View id="total" style={styles.row}>
                 <Text>
                   <Text style={[styles.bold, styles.uppercase]}>
-                    Valor total da adesão:{" "}
-                    {currencyBRL(currencyToNumber(pdf.total) - 200)}{" "}
+                    Valor total da adesão: {currencyBRL(currencyToNumber(pdf.total) - 200)}{" "}
                   </Text>
                   <Text style={{ marginRight: 15 }}>({proposal2})</Text>
                 </Text>
@@ -319,10 +283,7 @@ const PDF = () => {
                   Taxa administrativa com proteção roubo e furto: {pdf.admin}
                 </Text>
                 {pdf.discount > 0 ? (
-                  <Text>
-                    (Aplicado {pdf.discount}% de desconto na taxa
-                    administrativa)
-                  </Text>
+                  <Text>(Aplicado {pdf.discount}% de desconto na taxa administrativa)</Text>
                 ) : (
                   <></>
                 )}
@@ -335,10 +296,7 @@ const PDF = () => {
                 <Text>(quando houver)</Text>
               </View>
 
-              <View
-                id="subtitle"
-                style={{ paddingVertical: 10, alignSelf: "flex-start" }}
-              >
+              <View id="subtitle" style={{ paddingVertical: 10, alignSelf: "flex-start" }}>
                 <Text style={[styles.bold, styles.subtitle]}>
                   Proposta 3 - Proteção Veicular Contra Roubo e Furto
                 </Text>
@@ -383,8 +341,8 @@ const PDF = () => {
               <View style={[styles.line, { marginTop: 35 }]}></View>
               <View style={styles.footer}>
                 <Text>
-                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ
-                  nº 12.460.490/0002-79
+                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ nº
+                  12.460.490/0002-79
                 </Text>
               </View>
             </View>
@@ -395,13 +353,8 @@ const PDF = () => {
               <View id="title">
                 <Text style={styles.title}>Outros</Text>
               </View>
-              <View
-                id="subtitle"
-                style={{ paddingVertical: 10, alignSelf: "flex-start" }}
-              >
-                <Text style={[styles.bold, styles.subtitle]}>
-                  Rastreamento Veicular
-                </Text>
+              <View id="subtitle" style={{ paddingVertical: 10, alignSelf: "flex-start" }}>
+                <Text style={[styles.bold, styles.subtitle]}>Rastreamento Veicular</Text>
               </View>
               <View id="services" style={[styles.bold, styles.content]}>
                 <Text>Rastreamento Veicular Via GPRS</Text>
@@ -411,18 +364,14 @@ const PDF = () => {
               </View>
               <View id="group1" style={[styles.descriptions, styles.regular]}>
                 <Text>
-                  <Text style={[styles.bold, styles.uppercase]}>
-                    Adesão: R$ 300,00{" "}
-                  </Text>
+                  <Text style={[styles.bold, styles.uppercase]}>Adesão: R$ 300,00 </Text>
                   <Text style={{ marginRight: 15 }}>({others})</Text>
                 </Text>
                 <Text>(Inclusa instalação do equipamento)</Text>
               </View>
               <View id="group1" style={[styles.descriptions, styles.regular]}>
                 <Text>
-                  <Text style={[styles.bold, styles.uppercase]}>
-                    Valor Mensal: R$ 120,00{" "}
-                  </Text>
+                  <Text style={[styles.bold, styles.uppercase]}>Valor Mensal: R$ 120,00 </Text>
                   <Text style={{ marginRight: 15 }}>({value})</Text>
                 </Text>
               </View>
@@ -431,10 +380,9 @@ const PDF = () => {
               </View>
               <View>
                 <Text>
-                  - Nenhuma das propostas incluem seguro contra terceiros, para
-                  o mesmo, considerar o acréscimo de R$ 190,00 (
-                  {numero.porExtenso(190, "monetario")}) para inclusão através
-                  de parceiros;
+                  - Nenhuma das propostas incluem seguro contra terceiros, para o mesmo, considerar
+                  o acréscimo de R$ 190,00 ({numero.porExtenso(190, "monetario")}) para inclusão
+                  através de parceiros;
                 </Text>
                 <Text>- Proposta com validade de 05 dias;</Text>
                 <Text>- Valores atuais sujeitos a reajuste.</Text>
@@ -442,8 +390,8 @@ const PDF = () => {
               <View style={[styles.line, { marginTop: 315 }]}></View>
               <View style={styles.footer}>
                 <Text>
-                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ
-                  nº 12.460.490/0002-79
+                  Rua Guarani 58, Paupina. Fortaleza - CE, CEP 60.873-530, CNPJ nº
+                  12.460.490/0002-79
                 </Text>
               </View>
             </View>

@@ -11,6 +11,7 @@ import {
   LinkIcon,
   Pane,
   Popover,
+  RadioGroup,
   Switch,
   Text,
   TextInputField,
@@ -51,8 +52,8 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
-  const [fipe, setFipe] = useState("0");
-  const [admin, setAdmin] = useState("0");
+  const [fipe, setFipe] = useState(currencyBRL(0));
+  const [admin, setAdmin] = useState(currencyBRL(0));
   // Checkbox States
   const [accession, setAccession] = useState(true);
   const [theft, setTheft] = useState(true);
@@ -80,7 +81,7 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
   const [bodyWork, setBodyWork] = useState(false);
   const [bodyWorkValue, setBodyWorkValue] = useState("0");
   // Values of tax
-  const theftValue = theft ? 200 : 0;
+  // const theftValue = theft ? 200 : 0;
   const inspectionValue = inspection ? 50 : 0;
   const installationValue = installation ? 170 : 0;
   const [accessionState, setAccessionState] = useState(600);
@@ -91,6 +92,19 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
   const [cotas, setCotas] = useState(0);
   const [newValue, setNewValue] = useState(accessionState);
   const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", fipeDefault);
+
+  const [options] = useState([
+    {
+      label: "Proteção Nacional",
+      value: "200",
+    },
+    {
+      label: "Proteção Norte e Nordeste",
+      value: "140",
+    },
+  ]);
+
+  const [theftValue, setTheftValue] = useState("200");
 
   const handleClick = (e: SyntheticEvent<Element, Event>) => {
     e.preventDefault();
@@ -124,7 +138,7 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
   const total = currencyBRL(
     NP.round(
       adminDiscount +
-        theftValue +
+        parseInt(theftValue) +
         inspectionValue +
         installationValue +
         (accession ? accessionValue : 0),
@@ -139,10 +153,6 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
     total,
     cotas,
     discount: parseInt(discountValue),
-    theft,
-    inspection,
-    installation,
-    accession,
   };
 
   const [_pdfData, setPdfData] = useLocalStorage("pdf", pdfDefault);
@@ -167,8 +177,8 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
   // Clear the value of bodywork input if switch is off
   useEffect(() => {
     if (!bodyWork) {
-      setProtectedValue(fipe);
       setBodyWorkValue("0");
+      setProtectedValue(fipe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bodyWork]);
@@ -232,6 +242,7 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
         .get(`caminhoes/marcas/${brand}/modelos/${model}/anos/${year}`)
         .then(({ data }: AxiosResponse<FIPE>) => {
           setFipe(data.Valor);
+          setProtectedValue(data.Valor);
           setFipeData(data);
         })
         .catch((e: AxiosError) => {
@@ -269,6 +280,7 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
       setProtectedValue(currencyBRL(currencyToNumber(fipe) + currencyToNumber(bodyWorkValue)));
       setAdmin(currencyBRL(NP.round((fipeValue + body) * 0.0022, 2)));
       setAdminDiscount((fipeValue + body) * 0.0022);
+      setCotas(NP.round((fipeValue + body) / 10000, 0));
     }
   }, [bodyWorkValue, fipe]);
 
@@ -417,13 +429,6 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
               </Tooltip>
             </Popover>
           </Pane>
-          <Pane>
-            <Checkbox
-              checked={theft}
-              onChange={(e) => setTheft(e.target.checked)}
-              label={`Proteção Roubo e Furto: R$ 200.00 `}
-            />
-          </Pane>
           <Checkbox
             checked={inspection}
             onChange={(e) => setInspection(e.target.checked)}
@@ -433,6 +438,12 @@ const Home: NextPage<ServerProps> = ({ baseUrl }) => {
             checked={installation}
             onChange={(e) => setInstallation(e.target.checked)}
             label={`Instalação: R$ 170.00`}
+          />
+          <RadioGroup
+            value={theftValue}
+            size={16}
+            options={options}
+            onChange={(event) => setTheftValue(event.target.value)}
           />
         </Pane>
         <Pane>
