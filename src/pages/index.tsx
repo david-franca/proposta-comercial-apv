@@ -1,35 +1,96 @@
 import { AxiosError, AxiosResponse } from "axios";
+import { useFormik } from "formik";
+import NP from "number-precision";
+import { useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { FaWhatsapp } from "react-icons/fa";
+import Mask from "react-input-mask";
+import { v4 } from "uuid";
+import * as Yup from "yup";
+import { ptForm } from "yup-locale-pt";
+
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Button,
+  chakra,
   Checkbox,
-  Combobox,
-  EditIcon,
+  Collapse,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Heading,
-  IconButton,
-  Label,
+  Input,
+  InputGroup,
+  InputLeftAddon,
   Link,
-  LinkIcon,
-  Pane,
-  Popover,
+  NumberInput,
+  NumberInputField,
+  Radio,
   RadioGroup,
+  Select,
+  Stack,
   Switch,
   Text,
-  TextInputField,
-  Tooltip,
-} from "evergreen-ui";
-import { useRouter } from "next/router";
-import NP from "number-precision";
-import { ChangeEvent, MouseEventHandler, SyntheticEvent, useEffect, useState } from "react";
-import Mask from "react-input-mask";
+} from "@chakra-ui/react";
 
 import { FIPE, FipeApi, Models } from "../@types/interfaces";
+import { auth, db, logout } from "../firebase/clientApp";
+import { currencyBRL, currencyToNumber, fipeAPI, handleError } from "../utils";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { currencyBRL, currencyToNumber } from "../utils";
+import { GetServerSideProps, NextPage } from "next";
 import { absoluteUrl } from "../utils/baseURL";
-import { fipeAPI } from "../utils/fipe.utils";
-import { handleError } from "../utils/handle.utils";
 
-import type { GetServerSideProps, NextPage } from "next";
+Yup.setLocale(ptForm);
+
+const CFaWhatsapp = chakra(FaWhatsapp);
+interface FormValues {
+  fullName: string;
+  cellPhone: string;
+  email: string;
+  licensePlate: string;
+  brand: string;
+  model: string;
+  year: string;
+  fipe: number;
+  bodywork: number;
+  protected: string;
+  discount: number;
+  admin: number;
+  theft: string;
+  total: number;
+  accession: number;
+  inspection: number;
+  installation: number;
+  cotas: number;
+}
+
+interface ServerProps {
+  baseUrl?: string;
+}
+
+const initialValues: FormValues = {
+  fullName: "",
+  cellPhone: "",
+  email: "",
+  licensePlate: "",
+  brand: "",
+  model: "",
+  year: "",
+  fipe: 0,
+  bodywork: 0,
+  protected: "",
+  discount: 0,
+  admin: 0,
+  theft: "200",
+  total: 0,
+  accession: 600,
+  inspection: 50,
+  installation: 170,
+  cotas: 0,
+};
+
 const fipeDefault: FIPE = {
   Valor: "",
   Marca: "",
@@ -42,434 +103,531 @@ const fipeDefault: FIPE = {
   SiglaCombustivel: "",
 };
 
-interface ServerProps {
-  baseUrl?: string;
-}
+const dateLong = new Date().toLocaleDateString("pt-br", {
+  dateStyle: "long",
+});
 
-const Home: NextPage<ServerProps> = ({ baseUrl }) => {
-  // Form States
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [licensePlate, setLicensePlate] = useState("");
-  const [fipe, setFipe] = useState(currencyBRL(0));
-  const [admin, setAdmin] = useState(currencyBRL(0));
-  // Checkbox States
-  const [accession, setAccession] = useState(true);
-  const [theft, setTheft] = useState(true);
-  const [inspection, setInspection] = useState(true);
-  const [installation, setInstallation] = useState(true);
-  // Selected value on combobox
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
-  // Combobox itens
-  const [brands, setBrands] = useState<string[]>([]);
-  const [models, setModels] = useState<string[]>([]);
-  const [years, setYears] = useState<string[]>([]);
+const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
+
+const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
+  const formSchema = Yup.object().shape({
+    fullName: Yup.string().required().min(2),
+    cellPhone: Yup.string().matches(phoneRegExp, "Número de telefone inválido").required(),
+    email: Yup.string().email().required(),
+    licensePlate: Yup.string().required(),
+    brand: Yup.string().required(),
+    model: Yup.string().required(),
+    year: Yup.string().required(),
+    fipe: Yup.number().required().moreThan(0),
+    bodyWork: Yup.string().optional(),
+    protected: Yup.string().required(),
+    discount: Yup.number().optional().lessThan(100).positive(),
+    theft: Yup.string().required(),
+  });
+
+  const formik = useFormik({
+    validationSchema: formSchema,
+    initialValues,
+    onSubmit: (values) => {
+      addProposal(values);
+      setPdfData(values);
+      if (typeof window !== "undefined") {
+        window.open(`${baseUrl}/pdf`, "_blank");
+      }
+    },
+  });
+
   // FIPE values
   const [fetchedBrands, setFetchedBrands] = useState<FipeApi[]>([]);
   const [fetchedModels, setFetchedModels] = useState<FipeApi[]>([]);
   const [fetchedYears, setFetchedYears] = useState<FipeApi[]>([]);
-  // Loading states
-  const [brandLoading, setBrandLoading] = useState(false);
-  const [modelLoading, setModelLoading] = useState(false);
-  const [yearLoading, setYearLoading] = useState(false);
   // Switch States
   const [discount, setDiscount] = useState(false);
-  const [discountValue, setDiscountValue] = useState("0");
   const [bodyWork, setBodyWork] = useState(false);
-  const [bodyWorkValue, setBodyWorkValue] = useState("0");
-  // Values of tax
-  // const theftValue = theft ? 200 : 0;
-  const inspectionValue = inspection ? 50 : 0;
-  const installationValue = installation ? 170 : 0;
-  const [accessionState, setAccessionState] = useState(600);
-  const accessionValue = accessionState;
-  // Others States
-  const [adminDiscount, setAdminDiscount] = useState(0);
-  const [protectedValue, setProtectedValue] = useState("0");
-  const [cotas, setCotas] = useState(0);
-  const [newValue, setNewValue] = useState(accessionState);
+  // Checkbox states
+  const [accession, setAccession] = useState(true);
+  const [inspection, setInspection] = useState(true);
+  const [installation, setInstallation] = useState(true);
+
+  const [radioValue, setRadioValue] = useState("200");
+  const [admin, setAdmin] = useState(0);
+
+  const [user] = useAuthState(auth);
+  const [_pdfData, setPdfData] = useLocalStorage("pdf", initialValues);
   const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", fipeDefault);
 
-  const [options] = useState([
-    {
-      label: "Proteção Nacional",
-      value: "200",
-    },
-    {
-      label: "Proteção Norte e Nordeste",
-      value: "140",
-    },
-  ]);
+  // const [proposal, proposalLoading, proposalError] = useCollection(db.collection("proposal"), {});
 
-  const [theftValue, setTheftValue] = useState("200");
-
-  const handleClick = (e: SyntheticEvent<Element, Event>) => {
-    e.preventDefault();
-    setPdfData(pdfDefault);
-    if (typeof window !== "undefined") {
-      window.open(`${baseUrl}/pdf`, "_blank");
+  const addProposal = async (proposal: FormValues) => {
+    if (user) {
+      const id = v4();
+      await db.collection("propostas").doc(user.uid).collection("open").doc(id).set(proposal);
     }
   };
 
-  const filter = (name: string, array: FipeApi[]) => {
-    let filter: string | number = "";
-    array.forEach((value) => (value.nome === name ? (filter = value.codigo) : ""));
-    return filter;
-  };
-
-  const createArray = (array: FipeApi[]) => {
-    const value: string[] = [];
-    array.forEach((data) => {
-      if (data.nome === "32000") {
-        data.nome = "Zero KM";
-      }
-      value.push(data.nome);
-    });
-    return value;
-  };
-
-  const dateLong = new Date().toLocaleDateString("pt-br", {
-    dateStyle: "long",
-  });
-
-  const total = currencyBRL(
-    NP.round(
-      adminDiscount +
-        parseInt(theftValue) +
-        inspectionValue +
-        installationValue +
-        (accession ? accessionValue : 0),
-      2
-    )
+  const total = NP.plus(
+    formik.values.admin,
+    Number(formik.values.accession),
+    Number(formik.values.inspection),
+    Number(formik.values.installation),
+    Number(formik.values.theft)
   );
 
-  const pdfDefault = {
-    name: fullName,
-    phone: phone,
-    admin,
-    total,
-    cotas,
-    discount: parseInt(discountValue),
-  };
-
-  const [_pdfData, setPdfData] = useLocalStorage("pdf", pdfDefault);
-
-  // Calculate Admin Tax with or without discount.
-  useEffect(() => {
-    if (discount && discountValue) {
-      const adminTax = currencyToNumber(admin);
-      const percentage = parseInt(discountValue) / 100;
-      const d = adminTax - adminTax * percentage;
-      setAdminDiscount(d);
-    }
-    if (!discount) {
-      const adminTax = currencyToNumber(admin);
-      const percentage = 0;
-      const d = adminTax - adminTax * percentage;
-      setDiscountValue("0");
-      setAdminDiscount(d);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [discount, discountValue]);
-  // Clear the value of bodywork input if switch is off
-  useEffect(() => {
-    if (!bodyWork) {
-      setBodyWorkValue("0");
-      setProtectedValue(fipe);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyWork]);
   // Get the brands os trucks
   useEffect(() => {
-    setBrandLoading(true);
     fipeAPI
       .get(`caminhoes/marcas`)
       .then(({ data }: AxiosResponse<FipeApi[]>) => {
-        setBrands(createArray(data));
         setFetchedBrands(data);
-        setBrandLoading(false);
       })
       .catch((e: AxiosError) => {
         handleError(e);
-        setBrandLoading(false);
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Get the models of trucks based on brand
   useEffect(() => {
+    const brand = formik.values.brand;
     if (brand) {
-      setModelLoading(true);
       fipeAPI
         .get(`caminhoes/marcas/${brand}/modelos`)
         .then(({ data }: AxiosResponse<Models>) => {
-          setModels(createArray(data.modelos));
           setFetchedModels(data.modelos);
-          setModelLoading(false);
         })
         .catch((e: AxiosError) => {
           handleError(e);
-          setModelLoading(false);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brand]);
+  }, [formik.values.brand]);
   // Get the year of the vehicle based on model and brand.
   useEffect(() => {
+    const brand = formik.values.brand;
+    const model = formik.values.model;
+
     if (model) {
-      setYearLoading(true);
       fipeAPI
         .get(`caminhoes/marcas/${brand}/modelos/${model}/anos`)
         .then(({ data }: AxiosResponse<FipeApi[]>) => {
-          setYears(createArray(data));
           setFetchedYears(data);
-          setYearLoading(false);
         })
         .catch((e: AxiosError) => {
           handleError(e);
-          setYearLoading(false);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model]);
+  }, [formik.values.model]);
   // Get the FIPE values of all data.
   useEffect(() => {
+    const brand = formik.values.brand;
+    const model = formik.values.model;
+    const year = formik.values.year;
     if (year) {
       fipeAPI
         .get(`caminhoes/marcas/${brand}/modelos/${model}/anos/${year}`)
         .then(({ data }: AxiosResponse<FIPE>) => {
-          setFipe(data.Valor);
-          setProtectedValue(data.Valor);
-          setFipeData(data);
+          formik.setFieldValue("fipe", currencyToNumber(data.Valor));
         })
         .catch((e: AxiosError) => {
           handleError(e);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year]);
-  // When get the value of vehicle on the fipe table, set the variables
+  }, [formik.values.year]);
+  // Clear the bodywork value if bodywork switch is false
   useEffect(() => {
-    if (fipe) {
-      const fipeNumber = currencyToNumber(fipe);
-      setAdmin(currencyBRL(NP.round(fipeNumber * 0.0022, 2)));
-      setAdminDiscount(fipeNumber * 0.0022);
-      setCotas(NP.round(currencyToNumber(fipe) / 10000, 0));
-    }
-  }, [fipe]);
-  // Calculate the value of admin tax with fipe value and bodywork value
-  useEffect(() => {
-    const value = parseInt(bodyWorkValue);
-    const fipeNumber = currencyToNumber(fipe);
-    if (value && !Number.isNaN(value)) {
-      setAdmin(currencyBRL(NP.round((fipeNumber + value) * 0.0022, 2)));
-    } else if (bodyWork === false) {
-      setAdmin(currencyBRL(NP.round(fipeNumber * 0.0022, 2)));
+    if (!bodyWork) {
+      formik.setFieldValue("bodywork", 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyWorkValue]);
-  // Add the value of bodywork with the vehicle fipe value
+  }, [bodyWork]);
+  // Clear the discount value if discount switch is false
   useEffect(() => {
-    const body = currencyToNumber(bodyWorkValue);
-    const fipeValue = currencyToNumber(fipe);
-
-    if (fipeValue && body) {
-      setProtectedValue(currencyBRL(currencyToNumber(fipe) + currencyToNumber(bodyWorkValue)));
-      setAdmin(currencyBRL(NP.round((fipeValue + body) * 0.0022, 2)));
-      setAdminDiscount((fipeValue + body) * 0.0022);
-      setCotas(NP.round((fipeValue + body) / 10000, 0));
+    if (!discount) {
+      formik.setFieldValue("discount", 0);
     }
-  }, [bodyWorkValue, fipe]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [discount]);
+  // Set the value o vehicle on field FIPE
+  useEffect(() => {
+    const fipeValue = formik.values.fipe;
+    formik.setFieldValue("protected", currencyBRL(fipeValue).slice(3));
+    formik.setFieldValue("cotas", NP.round(fipeValue / 10000, 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formik.values.fipe]);
+
+  useEffect(() => {
+    const bodywork = Number(formik.values.bodywork ?? 0);
+    const fipeValue = Number(formik.values.fipe);
+    const total = NP.plus(bodywork, fipeValue);
+    formik.setFieldValue("protected", currencyBRL(total).slice(3));
+    formik.setFieldValue("cotas", NP.round(total / 10000, 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formik.values.bodywork]);
+
+  useEffect(() => {
+    formik.setFieldValue("theft", radioValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [radioValue]);
+
+  useEffect(() => {
+    const protectedValue = currencyToNumber(formik.values.protected);
+
+    if (protectedValue && protectedValue > 0) {
+      formik.setFieldValue("admin", NP.round(protectedValue * 0.0022, 2));
+      setAdmin(NP.round(protectedValue * 0.0022, 2));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formik.values.protected]);
+
+  useEffect(() => {
+    const protectedValue = currencyToNumber(formik.values.protected);
+    const adminValue = protectedValue * 0.0022;
+
+    if (formik.values.discount && formik.values.discount > 0) {
+      formik.setFieldValue(
+        "admin",
+        NP.round(adminValue - adminValue * (formik.values.discount / 100), 2)
+      );
+    }
+    if (!formik.values.discount) {
+      formik.setFieldValue("admin", NP.round(protectedValue * 0.0022, 2));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formik.values.discount]);
+
+  useEffect(() => {
+    if (accession) {
+      formik.setFieldValue("accession", 600);
+    } else {
+      formik.setFieldValue("accession", 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accession]);
+
+  useEffect(() => {
+    if (inspection) {
+      formik.setFieldValue("inspection", 50);
+    } else {
+      formik.setFieldValue("inspection", 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inspection]);
+
+  useEffect(() => {
+    if (installation) {
+      formik.setFieldValue("installation", 170);
+    } else {
+      formik.setFieldValue("installation", 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [installation]);
+
+  useEffect(() => {
+    formik.setFieldValue("total", total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total]);
 
   return (
-    <Pane
+    <Flex
       id="container"
-      display="flex"
       alignItems="center"
+      backgroundColor="gray.200"
       justifyContent="center"
       flexDirection="column"
       padding={0}
       margin={0}
     >
-      <Pane>
-        <Pane padding={20}>
-          <Heading size={600}>Proposta Comercial - Proteção Veicular</Heading>
-        </Pane>
-        <Text paddingBottom={20}>Fortaleza - {dateLong}</Text>
-        <Pane paddingY={10}>
-          <TextInputField
-            label="Nome Completo"
-            required
-            value={fullName}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
-          />
-          <Mask
-            mask="(99) 99999 9999"
-            value={phone}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
+      <Heading size="md">Proposta Comercial - Proteção Veicular</Heading>
+      <Text>
+        {!user ? "" : user.displayName} - Fortaleza - {dateLong}
+      </Text>
+      <form noValidate onSubmit={formik.handleSubmit}>
+        <Stack spacing={3} backgroundColor="whiteAlpha.900" p="2rem" width="50vw" boxShadow="md">
+          <FormControl
+            isRequired
+            isInvalid={formik.touched.fullName && Boolean(formik.errors.fullName)}
           >
-            {() => <TextInputField id="cellPhone" required label="Telefone" type="tel" />}
-          </Mask>
-          <TextInputField
-            label="E-mail"
-            required
-            value={email}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          />
-          <Mask
-            mask="aaa-9**9"
-            value={licensePlate}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setLicensePlate(e.target.value.toUpperCase())
-            }
+            <FormLabel htmlFor="fullName">Nome Completo</FormLabel>
+            <Input
+              id="fullName"
+              label="Nome Completo"
+              type="text"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+            />
+            <FormErrorMessage>{formik.touched.fullName && formik.errors.fullName}</FormErrorMessage>
+          </FormControl>
+          <FormControl
+            isRequired
+            isInvalid={formik.touched.cellPhone && Boolean(formik.errors.cellPhone)}
           >
-            {() => (
-              <TextInputField id="licensePlate" required label="Placa do Veículo" type="text" />
-            )}
-          </Mask>
-        </Pane>
-        <Pane>
-          <Label>Consulta Tabela FIPE</Label>
-          <Combobox
-            items={brands}
-            isLoading={brandLoading}
-            placeholder="Marca do Veículo"
-            onChange={(selected) => setBrand(filter(selected, fetchedBrands))}
-            paddingY={10}
-            width="100%"
-          />
-          <Combobox
-            items={models}
-            isLoading={modelLoading}
-            placeholder="Modelo do Veículo"
-            onChange={(selected) => setModel(filter(selected, fetchedModels))}
-            paddingY={10}
-            width="100%"
-          />
-          <Combobox
-            items={years}
-            isLoading={yearLoading}
-            placeholder="Ano do Veículo"
-            onChange={(selected) => setYear(filter(selected, fetchedYears))}
-            paddingY={10}
-            width="100%"
-          />
-          <TextInputField label="Valor na tabela FIPE" placeholder="R$ ..." value={fipe} readOnly />
-          <Pane display="flex" flexDirection="row" paddingBottom={15}>
-            <Label paddingRight={10}>Possui Implemento?</Label>
-            <Switch
-              checked={bodyWork}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setBodyWork(e.target.checked)}
-            />
-          </Pane>
-          <Pane hidden={!bodyWork}>
-            <TextInputField
-              placeholder="R$"
-              label="Valor do Agregado"
-              value={bodyWorkValue}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setBodyWorkValue(e.target.value)}
-            />
-          </Pane>
-          <TextInputField
-            label="Valor Protegido"
-            placeholder="R$ ..."
-            value={protectedValue}
-            readOnly
-          />
-          <TextInputField label="Taxa Administrativa" readOnly placeholder="R$ ..." value={admin} />
-        </Pane>
-        <Pane display="flex" flexDirection="row" paddingBottom={15}>
-          <Label paddingRight={10}>Desconto?</Label>
-          <Switch
-            checked={discount}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setDiscount(e.target.checked)}
-          />
-        </Pane>
-        <Pane hidden={!discount}>
-          <TextInputField
-            label="Percentagem"
-            value={discountValue}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setDiscountValue(e.target.value)}
-          />
-        </Pane>
-        <Pane display="flex" flexDirection="column">
-          <Pane display="flex" alignItems="center">
-            <Checkbox
-              paddingRight={5}
-              checked={accession}
-              onChange={(e) => setAccession(e.target.checked)}
-              label={`Taxa de Adesão: ${currencyBRL(accessionValue)}`}
-            />
-            <Popover
-              content={
-                <Pane
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <TextInputField
-                    type="number"
-                    label="Novo Valor"
-                    value={accessionState}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setAccessionState(parseInt(e.target.value))
-                    }
-                    min={50}
-                    max={1000}
-                  />
-                </Pane>
-              }
+            <FormLabel htmlFor="cellPhone">Telefone</FormLabel>
+            <Mask
+              mask="(99) 99999 9999"
+              value={formik.values.cellPhone}
+              onChange={formik.handleChange}
             >
-              <Tooltip content="Editar">
-                <IconButton icon={EditIcon} color="muted" border="none" />
-              </Tooltip>
-            </Popover>
-          </Pane>
-          <Checkbox
-            checked={inspection}
-            onChange={(e) => setInspection(e.target.checked)}
-            label={`Taxa de Vistoria: R$ 50.00`}
-          />
-          <Checkbox
-            checked={installation}
-            onChange={(e) => setInstallation(e.target.checked)}
-            label={`Instalação: R$ 170.00`}
-          />
-          <RadioGroup
-            value={theftValue}
-            size={16}
-            options={options}
-            onChange={(event) => setTheftValue(event.target.value)}
-          />
-        </Pane>
-        <Pane>
-          <TextInputField label="Total" readOnly value={total} />
-          <TextInputField
-            label="Cotas"
-            readOnly
-            value={currencyToNumber(discountValue) === 50 ? cotas / 2 : cotas}
-          />
-        </Pane>
-        <Pane paddingBottom={20} display="flex" justifyContent="space-evenly">
-          <Button formTarget="_blank" onClick={handleClick}>
-            Download PDF
-          </Button>
-          <Link
-            target="_blank"
-            href={`https://api.whatsapp.com/send?phone=5585987884378&text=*Proteção%20Veicular%20Completa*%20%0a%0a%20*Veículo:*%20Caminhão%0a%20*Valor%20FIPE:*%20${fipe}%20%0a%20*Adesão:*%20${total}%20%0a%20*Mensalidade:*%20${admin}%20%0a%20*Estimativa%20de%20Rateio:*%20${currencyBRL(
-              cotas * 20
-            )}`}
-            rel="noopener noreferrer"
+              {() => <Input id="cellPhone" label="Telefone" type="text" />}
+            </Mask>
+            <FormErrorMessage>
+              {formik.touched.cellPhone && formik.errors.cellPhone}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl isRequired isInvalid={formik.touched.email && Boolean(formik.errors.email)}>
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input
+              id="email"
+              type="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+            />
+            <FormErrorMessage>{formik.touched.email && formik.errors.email}</FormErrorMessage>
+          </FormControl>
+          <FormControl
+            isRequired
+            isInvalid={formik.touched.licensePlate && Boolean(formik.errors.licensePlate)}
           >
-            Whatsapp
-          </Link>
-        </Pane>
-      </Pane>
-    </Pane>
+            <FormLabel htmlFor="licensePlate">Placa do Veículo</FormLabel>
+            <Mask
+              mask="aaa-9**9"
+              value={formik.values.licensePlate.toUpperCase()}
+              onChange={formik.handleChange}
+            >
+              {() => <Input id="licensePlate" type="text" />}
+            </Mask>
+            <FormErrorMessage>
+              {formik.touched.licensePlate && formik.errors.licensePlate}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Consulta Tabela FIPE</FormLabel>
+            <Stack spacing={3}>
+              <Select
+                id="brand"
+                onChange={formik.handleChange}
+                value={formik.values.brand}
+                isRequired
+                isInvalid={
+                  (formik.touched.brand && Boolean(formik.errors.brand)) ||
+                  formik.values.brand === ""
+                }
+              >
+                <option value="" selected>
+                  Selecione
+                </option>
+                {fetchedBrands.map((brands, index) => (
+                  <option value={brands.codigo} key={index}>
+                    {brands.nome}
+                  </option>
+                ))}
+                <FormErrorMessage>{formik.touched.brand && formik.errors.brand}</FormErrorMessage>
+              </Select>
+              <Select
+                id="model"
+                onChange={formik.handleChange}
+                value={formik.values.model}
+                isRequired
+                isInvalid={
+                  (formik.touched.model && Boolean(formik.errors.model)) ||
+                  formik.values.model === ""
+                }
+              >
+                <option value="" selected>
+                  Selecione
+                </option>
+                {fetchedModels.map((models, index) => (
+                  <option value={models.codigo} key={index}>
+                    {models.nome}
+                  </option>
+                ))}
+                <FormErrorMessage>{formik.touched.model && formik.errors.model}</FormErrorMessage>
+              </Select>
+              <Select
+                id="year"
+                onChange={formik.handleChange}
+                value={formik.values.year}
+                isRequired
+                isInvalid={
+                  (formik.touched.year && Boolean(formik.errors.year)) || formik.values.year === ""
+                }
+              >
+                <option value="" selected>
+                  Selecione
+                </option>
+                {fetchedYears.map((years, index) => (
+                  <option value={years.codigo} key={index}>
+                    {years.nome}
+                  </option>
+                ))}
+                <FormErrorMessage>{formik.touched.year && formik.errors.year}</FormErrorMessage>
+              </Select>
+            </Stack>
+          </FormControl>
+          <FormControl
+            isRequired
+            isReadOnly
+            isInvalid={formik.touched.fipe && Boolean(formik.errors.fipe)}
+          >
+            <FormLabel htmlFor="fipe">Valor na Tabela FIPE</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>R$</InputLeftAddon>
+              <Input id="fipe" type="text" value={currencyBRL(formik.values.fipe).slice(3)} />
+            </InputGroup>
+            <FormErrorMessage>{formik.touched.fipe && formik.errors.fipe}</FormErrorMessage>
+          </FormControl>
+          <FormControl display="flex" alignItems="center">
+            <FormLabel htmlFor="bodywork" mb="0">
+              Possui Implemento?
+            </FormLabel>
+            <Switch
+              id="bodywork"
+              isChecked={bodyWork}
+              onChange={(e) => setBodyWork(e.target.checked)}
+            />
+          </FormControl>
+          <Collapse in={bodyWork} animateOpacity>
+            <FormControl>
+              <FormLabel htmlFor="bodywork">Valor do Agregado</FormLabel>
+              <InputGroup>
+                <InputLeftAddon>R$</InputLeftAddon>
+                <NumberInput id="bodywork" precision={2} value={formik.values.bodywork}>
+                  <NumberInputField onChange={formik.handleChange} />
+                </NumberInput>
+              </InputGroup>
+            </FormControl>
+          </Collapse>
+          <FormControl>
+            <FormLabel htmlFor="protectedValue">Valor Protegido</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>R$</InputLeftAddon>
+              <Input id="protectedValue" value={formik.values.protected} isReadOnly />
+            </InputGroup>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="admin">Taxa Administrativa</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>R$</InputLeftAddon>
+              <Input id="admin" value={admin} isReadOnly />
+            </InputGroup>
+          </FormControl>
+          <FormControl display="flex" alignItems="center">
+            <FormLabel htmlFor="discount" mb="0">
+              Desconto?
+            </FormLabel>
+            <Switch
+              id="discount"
+              isChecked={discount}
+              onChange={(e) => setDiscount(e.target.checked)}
+            />
+          </FormControl>
+          <Collapse in={discount} animateOpacity>
+            <FormControl isInvalid={formik.touched.discount && Boolean(formik.errors.discount)}>
+              <FormLabel htmlFor="discount">Percentagem</FormLabel>
+              <InputGroup>
+                <InputLeftAddon>%</InputLeftAddon>
+                <NumberInput
+                  step={1}
+                  min={0}
+                  max={100}
+                  id="discount"
+                  value={formik.values.discount}
+                  clampValueOnBlur={false}
+                >
+                  <NumberInputField onChange={formik.handleChange} />
+                </NumberInput>
+                <FormErrorMessage>
+                  {formik.touched.discount && formik.errors.discount}
+                </FormErrorMessage>
+              </InputGroup>
+            </FormControl>
+          </Collapse>
+          <FormControl display="flex" flexDir="column">
+            <FormLabel>Taxas</FormLabel>
+            <Checkbox
+              id="accession"
+              value={formik.values.accession}
+              isChecked={accession}
+              onChange={(e) => setAccession(e.target.checked)}
+            >
+              Adesão
+            </Checkbox>
+            <Checkbox
+              value={formik.values.inspection}
+              isChecked={inspection}
+              onChange={(e) => setInspection(e.target.checked)}
+            >
+              Vistoria
+            </Checkbox>
+            <Checkbox
+              value={formik.values.installation}
+              isChecked={installation}
+              onChange={(e) => setInstallation(e.target.checked)}
+            >
+              Instalação
+            </Checkbox>
+            <RadioGroup
+              id="theft"
+              value={radioValue}
+              onChange={setRadioValue}
+              display="flex"
+              flexDir="column"
+            >
+              <Radio value="200">Proteção Nacional</Radio>
+              <Radio value="140">Proteção Norte e Nordeste</Radio>
+            </RadioGroup>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="total">Total</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>R$</InputLeftAddon>
+              <Input
+                id="total"
+                value={Number.isNaN(formik.values.total) ? 0 : formik.values.total}
+                isReadOnly
+              />
+            </InputGroup>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="cotas">Cotas</FormLabel>
+            <Input
+              id="cotas"
+              value={
+                formik.values.discount >= 50
+                  ? NP.round(formik.values.cotas / 2, 1)
+                  : NP.round(formik.values.cotas, 1)
+              }
+              isReadOnly
+            />
+          </FormControl>
+
+          <Flex paddingBottom={20} justifyContent="space-evenly">
+            <Button colorScheme="linkedin" type="submit">
+              Gerar PDF <ExternalLinkIcon mx="2px" />
+            </Button>
+
+            <Link
+              target="_blank"
+              isExternal
+              href={`https://api.whatsapp.com/send?phone=55${formik.values.cellPhone.replace(
+                /[^0-9,]+/g,
+                ""
+              )}&text=*Proteção%20Veicular%20Completa*%20%0a%0a%20*Veículo:*%20Caminhão%0a%20*Valor%20FIPE:*%20${currencyBRL(
+                formik.values.fipe
+              )}%20%0a%20*Adesão:*%20${currencyBRL(total)}%20%0a%20*Mensalidade:*%20${currencyBRL(
+                admin
+              )}%20%0a%20*Estimativa%20de%20Rateio:*%20${currencyBRL(formik.values.cotas * 20)}`}
+              rel="noopener noreferrer"
+            >
+              <Button colorScheme="whatsapp" leftIcon={<CFaWhatsapp />}>
+                Whatsapp
+              </Button>
+            </Link>
+          </Flex>
+        </Stack>
+      </form>
+    </Flex>
   );
 };
 
@@ -483,4 +641,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-export default Home;
+export default NextUi;
