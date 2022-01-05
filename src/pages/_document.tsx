@@ -1,26 +1,13 @@
-import Document, {
-  DocumentContext,
-  Head,
-  Html,
-  Main,
-  NextScript,
-} from "next/document";
+import Document, { DocumentContext, Head, Html, Main, NextScript } from "next/document";
 
-import { CssBaseline } from "@nextui-org/react";
 import { Fragment } from "react";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
-    const styles = CssBaseline.flush();
     return {
       ...initialProps,
-      style: (
-        <Fragment>
-          {initialProps.styles}
-          {styles}
-        </Fragment>
-      ),
+      style: <Fragment>{initialProps.styles}</Fragment>,
     };
   }
 

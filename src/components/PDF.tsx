@@ -1,3 +1,8 @@
+import numero from "numero-por-extenso";
+import { useState } from "react";
+import { FaFileDownload } from "react-icons/fa";
+import { Waiting } from "./Waiting";
+import { Box, Button, chakra, CircularProgress, Flex } from "@chakra-ui/react";
 /* eslint-disable jsx-a11y/alt-text */
 import {
   Document,
@@ -9,10 +14,12 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import numero from "numero-por-extenso";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+
 import { FIPE } from "../@types/interfaces";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import { currencyBRL, currencyToNumber } from "../utils";
+
+const CFaFileDownload = chakra(FaFileDownload);
 
 const fonts = {
   regular: "Open Sans Regular",
@@ -402,12 +409,25 @@ export const PDFDoc = () => {
 
 const PDF = () => {
   const [pdf] = useLocalStorage("pdf", pdfDefault);
+  const [load, setLoad] = useState(false);
   return (
-    <div>
-      <PDFDownloadLink document={<PDFDoc />} fileName={`${pdf.licensePlate}.pdf`}>
-        {({ blob, url, loading, error }) => (loading ? "Loading document..." : "Download now!")}
-      </PDFDownloadLink>
-    </div>
+    <Flex flexDir="column">
+      <Box hidden={!load} w="56">
+        <Waiting />
+      </Box>
+      <Button hidden={load} colorScheme="red" leftIcon={<CFaFileDownload />}>
+        <PDFDownloadLink
+          document={<PDFDoc />}
+          fileName={`${pdf.licensePlate}.pdf`}
+          style={{ color: "white" }}
+        >
+          {({ blob, url, loading, error }) => {
+            setLoad(loading);
+            return loading ? "" : "Baixar Documento!";
+          }}
+        </PDFDownloadLink>
+      </Button>
+    </Flex>
   );
 };
 

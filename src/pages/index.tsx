@@ -1,16 +1,16 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { useFormik } from "formik";
+import { GetServerSideProps, NextPage } from "next";
 import NP from "number-precision";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaRegFilePdf, FaWhatsapp } from "react-icons/fa";
 import Mask from "react-input-mask";
 import { v4 } from "uuid";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Button,
   chakra,
@@ -37,14 +37,15 @@ import {
 
 import { FIPE, FipeApi, Models } from "../@types/interfaces";
 import { auth, db, logout } from "../firebase/clientApp";
-import { currencyBRL, currencyToNumber, fipeAPI, handleError } from "../utils";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { GetServerSideProps, NextPage } from "next";
+import { capitalizeWords, currencyBRL, currencyToNumber, fipeAPI, handleError } from "../utils";
 import { absoluteUrl } from "../utils/baseURL";
 
 Yup.setLocale(ptForm);
 
 const CFaWhatsapp = chakra(FaWhatsapp);
+const CFaRegFilePdf = chakra(FaRegFilePdf);
+
 interface FormValues {
   fullName: string;
   cellPhone: string;
@@ -121,15 +122,16 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
     fipe: Yup.number().required().moreThan(0),
     bodyWork: Yup.string().optional(),
     protected: Yup.string().required(),
-    discount: Yup.number().optional().lessThan(100).positive(),
+    discount: Yup.number().optional().lessThan(100),
     theft: Yup.string().required(),
   });
 
   const formik = useFormik({
     validationSchema: formSchema,
     initialValues,
-    onSubmit: (values) => {
-      addProposal(values);
+    onSubmit: async (values) => {
+      console.log(values);
+      await addProposal(values);
       setPdfData(values);
       if (typeof window !== "undefined") {
         window.open(`${baseUrl}/pdf`, "_blank");
@@ -153,6 +155,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
   const [admin, setAdmin] = useState(0);
 
   const [user] = useAuthState(auth);
+  // Localhost values
   const [_pdfData, setPdfData] = useLocalStorage("pdf", initialValues);
   const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", fipeDefault);
 
@@ -161,7 +164,31 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
   const addProposal = async (proposal: FormValues) => {
     if (user) {
       const id = v4();
-      await db.collection("propostas").doc(user.uid).collection("open").doc(id).set(proposal);
+      await db
+        .collection("propostas")
+        .doc(user.uid)
+        .collection("open")
+        .doc(id)
+        .set({
+          fullName: capitalizeWords(proposal.fullName),
+          cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
+          email: proposal.email,
+          licensePlate: proposal.licensePlate,
+          brand: proposal.brand,
+          model: proposal.model,
+          year: proposal.year,
+          fipe: Number(proposal.fipe),
+          bodywork: Number(proposal.bodywork),
+          protected: currencyToNumber(proposal.protected),
+          discount: Number(proposal.discount),
+          admin: Number(proposal.admin),
+          theft: Number(proposal.theft),
+          total: proposal.total,
+          accession: proposal.accession,
+          inspection: proposal.inspection,
+          installation: proposal.installation,
+          cotas: proposal.cotas,
+        });
     }
   };
 
@@ -228,6 +255,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
         .get(`caminhoes/marcas/${brand}/modelos/${model}/anos/${year}`)
         .then(({ data }: AxiosResponse<FIPE>) => {
           formik.setFieldValue("fipe", currencyToNumber(data.Valor));
+          setFipeData(data);
         })
         .catch((e: AxiosError) => {
           handleError(e);
@@ -339,12 +367,20 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
       padding={0}
       margin={0}
     >
-      <Heading size="md">Proposta Comercial - Proteção Veicular</Heading>
-      <Text>
-        {!user ? "" : user.displayName} - Fortaleza - {dateLong}
+      <Heading paddingTop={10} size="md">
+        Proposta Comercial - Proteção Veicular
+      </Heading>
+      <Text padding={5}>
+        {!user ? "" : user.displayName}, Fortaleza - {dateLong}
       </Text>
       <form noValidate onSubmit={formik.handleSubmit}>
-        <Stack spacing={3} backgroundColor="whiteAlpha.900" p="2rem" width="50vw" boxShadow="md">
+        <Stack
+          spacing={3}
+          backgroundColor="whiteAlpha.900"
+          p="2rem"
+          width={{ base: "100vw", md: "50vw", xl: "50vw", lg: "50vw" }}
+          boxShadow="md"
+        >
           <FormControl
             isRequired
             isInvalid={formik.touched.fullName && Boolean(formik.errors.fullName)}
@@ -354,7 +390,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
               id="fullName"
               label="Nome Completo"
               type="text"
-              value={formik.values.fullName}
+              value={capitalizeWords(formik.values.fullName)}
               onChange={formik.handleChange}
             />
             <FormErrorMessage>{formik.touched.fullName && formik.errors.fullName}</FormErrorMessage>
@@ -602,9 +638,9 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
             />
           </FormControl>
 
-          <Flex paddingBottom={20} justifyContent="space-evenly">
-            <Button colorScheme="linkedin" type="submit">
-              Gerar PDF <ExternalLinkIcon mx="2px" />
+          <Flex justifyContent="space-evenly">
+            <Button colorScheme="red" type="submit" leftIcon={<CFaRegFilePdf />}>
+              Gerar PDF
             </Button>
 
             <Link

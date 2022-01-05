@@ -1,5 +1,6 @@
-import { Button, Pane, Strong, Text } from "evergreen-ui";
 import dynamic from "next/dynamic";
+
+import { Box, Flex, Text } from "@chakra-ui/react";
 
 const PDFViewer = dynamic(() => import("../components/PDF"), {
   ssr: false,
@@ -9,22 +10,21 @@ const PDFViewer = dynamic(() => import("../components/PDF"), {
 
 export const PDF = () => {
   return (
-    <Pane
-      display="flex"
+    <Flex
       justifyContent="center"
       width="100%"
       height="100vh"
       alignItems="center"
-      border={true}
       flexDirection="column"
     >
-      <Pane paddingY={10}>
-        <Strong>Clique abaixo para baixar o documento!</Strong>
-      </Pane>
-      <Pane border={true} paddingX={20} paddingY={10} borderRadius={25}>
+      <Flex paddingY={5} justifyContent="center" flexDirection="column" alignItems="center">
+        <Text>Espere carregar os dados e então</Text>
+        <Text>clique no botão abaixo para fazer o download do documento!</Text>
+      </Flex>
+      <Box>
         <PDFViewer />
-      </Pane>
-    </Pane>
+      </Box>
+    </Flex>
   );
 };
 
