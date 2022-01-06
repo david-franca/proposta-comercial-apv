@@ -36,6 +36,7 @@
     "react-icons": "^4.3.1",
     "react-input-mask": "^2.0.4",
     "react-lottie": "^1.2.3",
+    "react-social-icons": "^5.6.1",
     "uuid": "^8.3.2",
     "yup": "^0.32.11",
     "yup-locale-pt": "^0.0.9"
