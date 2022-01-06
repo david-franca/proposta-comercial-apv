@@ -38,7 +38,14 @@ import {
 import { FIPE, FipeApi, Models } from "../@types/interfaces";
 import { auth, db, logout } from "../firebase/clientApp";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { capitalizeWords, currencyBRL, currencyToNumber, fipeAPI, handleError } from "../utils";
+import {
+  capitalizeWords,
+  createLink,
+  currencyBRL,
+  currencyToNumber,
+  fipeAPI,
+  handleError,
+} from "../utils";
 import { absoluteUrl } from "../utils/baseURL";
 
 Yup.setLocale(ptForm);
@@ -158,6 +165,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
   // Localhost values
   const [_pdfData, setPdfData] = useLocalStorage("pdf", initialValues);
   const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", fipeDefault);
+  const [fipe, setFipe] = useState(fipeDefault);
 
   // const [proposal, proposalLoading, proposalError] = useCollection(db.collection("proposal"), {});
 
@@ -256,6 +264,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
         .then(({ data }: AxiosResponse<FIPE>) => {
           formik.setFieldValue("fipe", currencyToNumber(data.Valor));
           setFipeData(data);
+          setFipe(data);
         })
         .catch((e: AxiosError) => {
           handleError(e);
@@ -286,11 +295,15 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
   }, [formik.values.fipe]);
 
   useEffect(() => {
-    const bodywork = Number(formik.values.bodywork ?? 0);
-    const fipeValue = Number(formik.values.fipe);
-    const total = NP.plus(bodywork, fipeValue);
-    formik.setFieldValue("protected", currencyBRL(total).slice(3));
-    formik.setFieldValue("cotas", NP.round(total / 10000, 0));
+    const timeOut = setTimeout(() => {
+      const bodywork = Number(formik.values.bodywork ?? 0);
+      const fipeValue = Number(formik.values.fipe);
+      const total = NP.plus(bodywork, fipeValue);
+      formik.setFieldValue("protected", currencyBRL(total).slice(3));
+      formik.setFieldValue("cotas", NP.round(total / 10000, 0));
+    }, 500);
+
+    return () => clearTimeout(timeOut);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.bodywork]);
 
@@ -310,18 +323,22 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
   }, [formik.values.protected]);
 
   useEffect(() => {
-    const protectedValue = currencyToNumber(formik.values.protected);
-    const adminValue = protectedValue * 0.0022;
+    const timeOut = setTimeout(() => {
+      const protectedValue = currencyToNumber(formik.values.protected);
+      const adminValue = protectedValue * 0.0022;
 
-    if (formik.values.discount && formik.values.discount > 0) {
-      formik.setFieldValue(
-        "admin",
-        NP.round(adminValue - adminValue * (formik.values.discount / 100), 2)
-      );
-    }
-    if (!formik.values.discount) {
-      formik.setFieldValue("admin", NP.round(protectedValue * 0.0022, 2));
-    }
+      if (formik.values.discount && formik.values.discount > 0) {
+        formik.setFieldValue(
+          "admin",
+          NP.round(adminValue - adminValue * (formik.values.discount / 100), 2)
+        );
+      }
+      if (!formik.values.discount) {
+        formik.setFieldValue("admin", NP.round(protectedValue * 0.0022, 2));
+      }
+    }, 500);
+
+    return () => clearTimeout(timeOut);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.discount]);
 
@@ -416,7 +433,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
             <Input
               id="email"
               type="email"
-              value={formik.values.email}
+              value={formik.values.email.toLowerCase()}
               onChange={formik.handleChange}
             />
             <FormErrorMessage>{formik.touched.email && formik.errors.email}</FormErrorMessage>
@@ -646,14 +663,10 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
             <Link
               target="_blank"
               isExternal
-              href={`https://api.whatsapp.com/send?phone=55${formik.values.cellPhone.replace(
-                /[^0-9,]+/g,
-                ""
-              )}&text=*Proteção%20Veicular%20Completa*%20%0a%0a%20*Veículo:*%20Caminhão%0a%20*Valor%20FIPE:*%20${currencyBRL(
-                formik.values.fipe
-              )}%20%0a%20*Adesão:*%20${currencyBRL(total)}%20%0a%20*Mensalidade:*%20${currencyBRL(
-                admin
-              )}%20%0a%20*Estimativa%20de%20Rateio:*%20${currencyBRL(formik.values.cotas * 20)}`}
+              href={createLink(
+                { admin: String(admin), phone: formik.values.cellPhone.replace(/[^0-9,]+/g, "") },
+                fipe
+              )}
               rel="noopener noreferrer"
             >
               <Button colorScheme="whatsapp" leftIcon={<CFaWhatsapp />}>
