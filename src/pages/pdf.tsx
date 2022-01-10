@@ -2,6 +2,8 @@ import dynamic from "next/dynamic";
 
 import { Box, Flex, Text } from "@chakra-ui/react";
 
+import { Head } from "../components/Head";
+
 const PDFViewer = dynamic(() => import("../components/PDF"), {
   ssr: false,
 });
@@ -17,6 +19,7 @@ export const PDF = () => {
       alignItems="center"
       flexDirection="column"
     >
+      <Head title="Login" />
       <Flex paddingY={5} justifyContent="center" flexDirection="column" alignItems="center">
         <Text>Espere carregar os dados e então</Text>
         <Text>clique no botão abaixo para fazer o download do documento!</Text>

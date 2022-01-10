@@ -4,14 +4,15 @@ import { currencyBRL } from "./currency.utils";
 export const createLink = (
   config: {
     phone: string;
-    admin: string;
+    admin: number;
+    theft: number;
+    cota: number;
   },
   fipe: FIPE
 ) => {
-  const { phone, admin } = config;
+  const { phone, admin, theft, cota } = config;
   const space = "%20";
   const breakLine = "%0a";
-
   const model = [
     "🚛APV TRUCK🚛",
     "",
@@ -38,7 +39,7 @@ export const createLink = (
     `FIPE: ${fipe.Valor}`,
     "",
     "➡️ MENSALIDADE:",
-    currencyBRL(admin),
+    currencyBRL(admin + theft + cota * 21.16),
     "",
     "➡️Taxa de agregamento:",
     "R$ 2.169,00 + primeira mensalidade.",

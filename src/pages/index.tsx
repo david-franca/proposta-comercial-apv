@@ -47,6 +47,7 @@ import {
   handleError,
 } from "../utils";
 import { absoluteUrl } from "../utils/baseURL";
+import { Head } from "../components/Head";
 
 Yup.setLocale(ptForm);
 
@@ -72,6 +73,7 @@ interface FormValues {
   inspection: number;
   installation: number;
   cotas: number;
+  mensal: number;
 }
 
 interface ServerProps {
@@ -97,6 +99,7 @@ const initialValues: FormValues = {
   inspection: 50,
   installation: 170,
   cotas: 0,
+  mensal: 0,
 };
 
 const fipeDefault: FIPE = {
@@ -207,6 +210,22 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
     Number(formik.values.installation),
     Number(formik.values.theft)
   );
+
+  const mensal = Number(admin) + Number(formik.values.theft) + Number(formik.values.cotas) * 21.16;
+
+  const openInNewTab = (): void => {
+    const url = createLink(
+      {
+        admin: Number(admin),
+        phone: formik.values.cellPhone.replace(/[^0-9,]+/g, ""),
+        theft: parseInt(formik.values.theft),
+        cota: Number(formik.values.cotas),
+      },
+      fipe
+    );
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (newWindow) newWindow.opener = null;
+  };
 
   // Get the brands os trucks
   useEffect(() => {
@@ -371,6 +390,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
 
   useEffect(() => {
     formik.setFieldValue("total", total);
+    formik.setFieldValue("mensal", mensal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total]);
 
@@ -384,6 +404,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
       padding={0}
       margin={0}
     >
+      <Head title="Proposta Comercial" />
       <Heading paddingTop={10} size="md">
         Proposta Comercial - Proteção Veicular
       </Heading>
@@ -654,25 +675,29 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
               isReadOnly
             />
           </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="mensal">Mensal</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>R$</InputLeftAddon>
+              <Input
+                id="mensal"
+                value={Number.isNaN(formik.values.mensal) ? 0 : formik.values.mensal}
+                isReadOnly
+              />
+            </InputGroup>
+          </FormControl>
 
           <Flex justifyContent="space-evenly">
             <Button colorScheme="red" type="submit" leftIcon={<CFaRegFilePdf />}>
               Gerar PDF
             </Button>
-
-            <Link
-              target="_blank"
-              isExternal
-              href={createLink(
-                { admin: String(admin), phone: formik.values.cellPhone.replace(/[^0-9,]+/g, "") },
-                fipe
-              )}
-              rel="noopener noreferrer"
+            <Button
+              colorScheme="whatsapp"
+              leftIcon={<CFaWhatsapp />}
+              onClick={() => openInNewTab()}
             >
-              <Button colorScheme="whatsapp" leftIcon={<CFaWhatsapp />}>
-                Whatsapp
-              </Button>
-            </Link>
+              Whatsapp
+            </Button>
           </Flex>
         </Stack>
       </form>

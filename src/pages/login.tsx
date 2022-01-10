@@ -14,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import { Head } from "../components/Head";
 import { auth, firebase } from "../firebase/clientApp";
 
 const CFaGlobe = chakra(FaGlobe);
@@ -37,12 +38,13 @@ const Login = () => {
     <Grid
       templateColumns={["repeat(1, 1fr)", "repeat(1, 1fr)", "repeat(3, 1fr)"]}
       gap={3}
-      backgroundImage="url('/images/fundo.png')"
+      backgroundImage="url('/images/bg.png')"
       backgroundRepeat="no-repeat"
       backgroundAttachment="fixed"
       backgroundPosition="center"
       backgroundSize="cover"
     >
+      <Head title="Login" />
       <GridItem
         w="100%"
         h="100vh"
