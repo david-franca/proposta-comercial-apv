@@ -1,8 +1,7 @@
 import numero from "numero-por-extenso";
 import { useState } from "react";
 import { FaFileDownload } from "react-icons/fa";
-import { Waiting } from "./Waiting";
-import { Box, Button, chakra, CircularProgress, Flex } from "@chakra-ui/react";
+import { Button, Center, chakra, CircularProgress, Flex } from "@chakra-ui/react";
 /* eslint-disable jsx-a11y/alt-text */
 import {
   Document,
@@ -412,16 +411,16 @@ const PDF = () => {
   const [load, setLoad] = useState(false);
   return (
     <Flex flexDir="column">
-      <Box hidden={!load} w="56">
-        <Waiting />
-      </Box>
+      <Center hidden={!load} w="56">
+        <CircularProgress isIndeterminate color="green.300" size="120px" />
+      </Center>
       <Button hidden={load} colorScheme="red" leftIcon={<CFaFileDownload />}>
         <PDFDownloadLink
           document={<PDFDoc />}
           fileName={`${pdf.licensePlate}.pdf`}
           style={{ color: "white" }}
         >
-          {({ blob, url, loading, error }) => {
+          {({ loading }) => {
             setLoad(loading);
             return loading ? "" : "Baixar Documento!";
           }}

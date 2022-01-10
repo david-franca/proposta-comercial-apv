@@ -19,10 +19,10 @@ export const PDF = () => {
       alignItems="center"
       flexDirection="column"
     >
-      <Head title="Login" />
+      <Head title="Download PDF" />
       <Flex paddingY={5} justifyContent="center" flexDirection="column" alignItems="center">
         <Text>Espere carregar os dados e então</Text>
-        <Text>clique no botão abaixo para fazer o download do documento!</Text>
+        <Text>Clique no botão abaixo para fazer o download do documento!</Text>
       </Flex>
       <Box>
         <PDFViewer />

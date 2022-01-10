@@ -220,6 +220,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
         phone: formik.values.cellPhone.replace(/[^0-9,]+/g, ""),
         theft: parseInt(formik.values.theft),
         cota: Number(formik.values.cotas),
+        total,
       },
       fipe
     );
@@ -532,7 +533,7 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
                 </option>
                 {fetchedYears.map((years, index) => (
                   <option value={years.codigo} key={index}>
-                    {years.nome}
+                    {years.nome === "32000" ? "Zero Km" : years.nome}
                   </option>
                 ))}
                 <FormErrorMessage>{formik.touched.year && formik.errors.year}</FormErrorMessage>
@@ -681,7 +682,11 @@ const NextUi: NextPage<ServerProps> = ({ baseUrl }) => {
               <InputLeftAddon>R$</InputLeftAddon>
               <Input
                 id="mensal"
-                value={Number.isNaN(formik.values.mensal) ? 0 : formik.values.mensal}
+                value={
+                  Number.isNaN(formik.values.mensal)
+                    ? 0
+                    : currencyBRL(NP.round(formik.values.mensal, 2)).slice(3)
+                }
                 isReadOnly
               />
             </InputGroup>

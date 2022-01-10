@@ -7,10 +7,11 @@ export const createLink = (
     admin: number;
     theft: number;
     cota: number;
+    total: number;
   },
   fipe: FIPE
 ) => {
-  const { phone, admin, theft, cota } = config;
+  const { phone, admin, theft, cota, total } = config;
   const space = "%20";
   const breakLine = "%0a";
   const model = [
@@ -33,21 +34,16 @@ export const createLink = (
     "✅ Sem perfil de condutor 👩🏻👨🏻",
     "✅ Localizador sem custo na mensalidade",
     "",
-    "➡ COTA DE PARTICIPAÇÃO: APENAS 3%",
-    "",
     `${fipe.Marca} ${fipe.Modelo} ${fipe.AnoModelo}`,
     `FIPE: ${fipe.Valor}`,
     "",
     "➡️ MENSALIDADE:",
     currencyBRL(admin + theft + cota * 21.16),
     "",
-    "➡️Taxa de agregamento:",
-    "R$ 2.169,00 + primeira mensalidade.",
+    "➡️Taxa de associação:",
+    `${currencyBRL(total)}, já incluso a primeira mensalidade.`,
     "",
-    "➡️Taxa de agregamento promocional até 20/07",
-    "R$ 1.518,00 já incluso primeira mensalidade (a vista)",
-    "",
-    "Próxima mensalidade 25/08/2021",
+    "Proposta válida por 5 dias",
   ];
 
   const result = model.map((data) => data.replace(/\s/g, space)).join(breakLine);
