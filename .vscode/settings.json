@@ -15,7 +15,8 @@
     "Localizador",
     "monitoramento",
     "nextui",
-    "Rastreamento"
+    "Rastreamento",
+    "semibold"
   ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#b61a3d",

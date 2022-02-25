@@ -1,5 +1,4 @@
 import Document, { DocumentContext, Head, Html, Main, NextScript } from "next/document";
-
 import { Fragment } from "react";
 
 class MyDocument extends Document {
@@ -14,7 +13,12 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head>
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
+          />
+        </Head>
         <body>
           <Main />
           <NextScript />

@@ -19,3 +19,13 @@ export interface Models {
   anos: FipeApi[];
   modelos: FipeApi[];
 }
+
+export interface Routes {
+  category?: string;
+  path?: string;
+  state?: string;
+  name: string;
+  icon?: JSX.Element;
+  component: string;
+  layout?: string;
+}

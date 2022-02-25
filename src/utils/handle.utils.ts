@@ -1,14 +1,13 @@
 import { AxiosError } from "axios";
-import { toaster } from "evergreen-ui";
 
-export const handleError = (e: AxiosError): void => {
+export const handleError = (e: AxiosError) => {
   if (e.response) {
     const message: string | string[] = e.response.data.message;
     if (typeof message === "string") {
-      toaster.danger(message);
+      return message;
     }
     if (Array.isArray(message)) {
-      message.map((data) => toaster.danger(data));
+      return message.map((data) => data);
     }
   }
 };
