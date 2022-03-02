@@ -36,8 +36,8 @@ import {
   UseToastOptions,
 } from "@chakra-ui/react";
 
-import { FIPE, FipeApi, Models } from "../@types/interfaces";
-import { auth, Propostas } from "../firebase";
+import { FIPE, FipeApi, Models, Status } from "../@types/interfaces";
+import { auth, Propostas, Users } from "../firebase";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import {
   capitalizeWords,
@@ -63,7 +63,7 @@ interface FormValues {
   year: string;
   fipe: number;
   bodywork: number;
-  protected: string;
+  protected: number;
   discount: number;
   admin: number;
   theft: string;
@@ -85,7 +85,7 @@ const initialValues: FormValues = {
   year: "",
   fipe: 0,
   bodywork: 0,
-  protected: "",
+  protected: 0,
   discount: 0,
   admin: 0,
   theft: "200",
@@ -175,6 +175,9 @@ const Handling = ({ id }: HandlingProps) => {
   const [planValue, setPlanValue] = useState("3");
   const [planValueDisabled, setPlanValueDisabled] = useState(false);
   const [admin, setAdmin] = useState(0);
+  const [userCode, setUserCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [statusProposta, setStatusProposta] = useState<Status>("Aguardando");
 
   const [user] = useAuthState(auth);
   // Localhost values
@@ -184,63 +187,81 @@ const Handling = ({ id }: HandlingProps) => {
   // const [proposal, proposalLoading, proposalError] = useCollection(db.collection("proposal"), {});
 
   const addProposal = async (proposal: FormValues) => {
-    if (user && !id) {
-      const id = v4();
-      const today = moment();
+    try {
+      setLoading(true);
+      if (user && !id) {
+        const id = v4();
+        const today = moment();
 
-      await Propostas().create(id, {
-        createdBy: user.uid,
-        createdAt: Timestamp.fromDate(today.toDate()),
-        updatedAt: Timestamp.fromDate(today.toDate()),
-        expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
-        fullName: capitalizeWords(proposal.fullName),
-        cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
-        email: proposal.email,
-        licensePlate: proposal.licensePlate,
-        brand: proposal.brand,
-        model: proposal.model,
-        year: proposal.year,
-        fipe: Number(proposal.fipe),
-        bodywork: Number(proposal.bodywork),
-        protected: currencyToNumber(proposal.protected),
-        discount: Number(proposal.discount),
-        admin: Number(proposal.admin),
-        theft: Number(proposal.theft),
-        total: proposal.total,
-        accession: proposal.accession,
-        inspection: proposal.inspection,
-        installation: proposal.installation,
-        cotas: proposal.cotas,
-      });
-    }
+        await Propostas().create(id, {
+          createdBy: user.uid,
+          createdAt: Timestamp.fromDate(today.toDate()),
+          updatedAt: Timestamp.fromDate(today.toDate()),
+          expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
+          fullName: capitalizeWords(proposal.fullName),
+          cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
+          email: proposal.email,
+          licensePlate: proposal.licensePlate,
+          brand: proposal.brand,
+          model: proposal.model,
+          year: proposal.year,
+          fipe: Number(proposal.fipe),
+          bodywork: Number(proposal.bodywork),
+          protected: proposal.protected,
+          discount: Number(proposal.discount),
+          admin: Number(proposal.admin),
+          theft: Number(proposal.theft),
+          total: proposal.total,
+          accession: proposal.accession,
+          inspection: proposal.inspection,
+          installation: proposal.installation,
+          cotas: proposal.cotas,
+        });
+      }
 
-    if (user && id) {
-      const today = moment();
+      if (user && id) {
+        const today = moment();
 
-      await Propostas().update(id, {
-        createdBy: user.uid,
-        updatedAt: Timestamp.fromDate(today.toDate()),
-        expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
-        fullName: capitalizeWords(proposal.fullName),
-        cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
-        email: proposal.email,
-        licensePlate: proposal.licensePlate,
-        brand: proposal.brand,
-        model: proposal.model,
-        year: proposal.year,
-        fipe: Number(proposal.fipe),
-        bodywork: Number(proposal.bodywork),
-        protected: currencyToNumber(proposal.protected),
-        discount: Number(proposal.discount),
-        admin: Number(proposal.admin),
-        theft: Number(proposal.theft),
-        total: proposal.total,
-        accession: proposal.accession,
-        inspection: proposal.inspection,
-        installation: proposal.installation,
-        cotas: proposal.cotas,
-        status: "Iniciado",
-      });
+        const data = {
+          createdBy: user.uid,
+          updatedAt: Timestamp.fromDate(today.toDate()),
+          expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
+          fullName: capitalizeWords(proposal.fullName),
+          cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
+          email: proposal.email,
+          licensePlate: proposal.licensePlate,
+          brand: proposal.brand,
+          model: proposal.model,
+          year: proposal.year,
+          fipe: Number(proposal.fipe),
+          bodywork: Number(proposal.bodywork),
+          protected: proposal.protected,
+          discount: Number(proposal.discount),
+          admin: Number(proposal.admin),
+          theft: Number(proposal.theft),
+          total: proposal.total,
+          accession: proposal.accession,
+          inspection: proposal.inspection,
+          installation: proposal.installation,
+          cotas: proposal.cotas,
+          status: "Iniciado",
+        };
+
+        await Propostas().update(id, data);
+
+        if (statusProposta === "Aguardando") {
+          const userByCode = await Users().getByCode(userCode);
+          const userId = userByCode.docs[0].id;
+          const wallet = userByCode.docs[0].data().wallet;
+          await Users().update(userId, {
+            wallet: wallet + 1,
+          });
+        }
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
     }
   };
 
@@ -417,7 +438,7 @@ const Handling = ({ id }: HandlingProps) => {
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      const protectedValue = currencyToNumber(formik.values.protected);
+      const protectedValue = formik.values.protected;
       const adminValue = protectedValue * 0.0022;
 
       if (formik.values.discount && formik.values.discount > 0) {
@@ -502,17 +523,20 @@ const Handling = ({ id }: HandlingProps) => {
             formik.setFieldValue("brand", proposta.brand ?? "");
             formik.setFieldValue("model", proposta.model ?? "");
             formik.setFieldValue("year", proposta.year ?? "");
-            formik.setFieldValue("fipe", Number(proposta.fipe) ?? 0);
-            formik.setFieldValue("bodywork", Number(proposta.bodywork) ?? 0);
+            formik.setFieldValue("fipe", Number(proposta.fipe ?? 0));
+            formik.setFieldValue("bodywork", Number(proposta.bodywork ?? 0));
             formik.setFieldValue("protected", proposta.protected ?? "");
-            formik.setFieldValue("discount", Number(proposta.discount) ?? 0);
-            formik.setFieldValue("admin", Number(proposta.admin) ?? 0);
-            formik.setFieldValue("theft", Number(proposta.theft) ?? 0);
+            formik.setFieldValue("discount", Number(proposta.discount ?? 0));
+            formik.setFieldValue("admin", Number(proposta.admin ?? 0));
+            formik.setFieldValue("theft", Number(proposta.theft ?? 0));
             formik.setFieldValue("total", proposta.total ?? "");
             formik.setFieldValue("accession", proposta.accession ?? "");
             formik.setFieldValue("inspection", proposta.inspection ?? "");
             formik.setFieldValue("installation", proposta.installation ?? "");
             formik.setFieldValue("cotas", proposta.cotas ?? "");
+            setUserCode(proposta.code ?? "");
+            setLoading(false);
+            setStatusProposta(proposta.status);
           }
         });
     }
@@ -1023,11 +1047,13 @@ const Handling = ({ id }: HandlingProps) => {
           fontSize="15px"
           color="white"
           fontWeight="bold"
+          isLoading={loading}
+          loadingText="Aguarde"
           w="100%"
           h="45"
           mb="24px"
           leftIcon={<CIoLogoWhatsapp />}
-          onClick={() => openInNewTab()}
+          /* onClick={() => openInNewTab()} */
           _hover={{
             bg: "teal.200",
           }}

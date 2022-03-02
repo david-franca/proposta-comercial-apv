@@ -26,3 +26,9 @@ export const Config = () => ({
   update: async (id: string, value: any): Promise<void> =>
     await configurations.doc(id).update(value),
 });
+
+export const Users = () => ({
+  getByCode: async (code: string) => await users.where("code", "==", code).get(),
+
+  update: async (id: string, value: any) => await users.doc(id).update(value),
+});

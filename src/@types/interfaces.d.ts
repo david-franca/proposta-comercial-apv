@@ -32,10 +32,12 @@ export interface Routes {
   layout?: string;
 }
 
-interface Row {
+export type Status = "Iniciado" | "Aprovado" | "Cancelado" | "Expirado" | "Aguardando";
+
+export interface Row {
   fullName: string;
   cellPhone: string;
-  status: "Iniciado" | "Aprovado" | "Cancelado" | "Expirado" | "Aguardando";
+  status: Status;
   photoURL: string;
   createdAt: Timestamp;
   expiresIn: Timestamp;
