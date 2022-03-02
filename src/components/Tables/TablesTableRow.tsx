@@ -19,15 +19,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 
-interface Row {
-  fullName: string;
-  cellPhone: string;
-  status: "Iniciado" | "Aprovado" | "Cancelado" | "Expirado" | "Aguardando";
-  photoURL: string;
-  createdAt: Timestamp;
-  expiresIn: Timestamp;
-  id: string;
-}
+import { Row } from "../../@types/interfaces";
 
 interface TablesRowProps {
   row: Row;
@@ -43,10 +35,10 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
   // let bgStatus = useColorModeValue("gray.400", "#1a202c");
 
   const formatCellPhone = (value: string) => {
-    const head = value.substring(2, 4);
-    const number = value.substring(4);
+    const head = value.substring(0, 2);
+    const number = value.substring(2, 7) + "-" + value.substring(7);
 
-    return `(${head}) 9${number}`;
+    return `(${head}) ${number}`;
   };
 
   useEffect(() => {

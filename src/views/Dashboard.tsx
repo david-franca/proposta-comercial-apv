@@ -1,79 +1,109 @@
 import {
-  IoArrowForward,
   IoCart,
   IoDocument,
   IoGlobe,
   IoRocket,
+  IoShieldCheckmark,
   IoStatsChart,
+  IoTimer,
+  IoTrophy,
   IoWallet,
+  IoWarning,
 } from "react-icons/io5";
 
 import {
   Box,
-  Button,
   Flex,
   Grid,
   Icon,
-  Image,
-  Portal,
   Progress,
   SimpleGrid,
-  Spacer,
   Stat,
   StatHelpText,
   StatLabel,
   StatNumber,
-  Table,
-  Tbody,
   Text,
-  Th,
-  Thead,
-  Tr,
-  useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
 
 import Card from "../components/Card/Card";
 import CardBody from "../components/Card/CardBody";
 import IconBox from "../components/Icons/IconBox";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import BarChart from "../components/Charts/BarChart";
 import CardHeader from "../components/Card/CardHeader";
 import LineChart from "../components/Charts/LineChart";
-
-const cardsData = [
-  {
-    label: "Novos Usuários",
-    value: "R$53,00",
-    stats: "+55%",
-    icon: IoWallet,
-  },
-  {
-    label: "Pendentes",
-    value: "2,300",
-    stats: "+5%",
-    icon: IoGlobe,
-  },
-  {
-    label: "New Clients",
-    value: "+3,020",
-    stats: "-14%",
-    icon: IoDocument,
-  },
-  {
-    label: "Total Sales",
-    value: "$173,000",
-    stats: "+8%",
-    icon: IoCart,
-  },
-];
+import { Propostas } from "../firebase";
 
 const Dashboard = () => {
   const iconTeal = useColorModeValue("red.500", "red.500");
   const iconBoxInside = useColorModeValue("white", "white");
   const textColor = useColorModeValue("gray.700", "white");
+  const [waiting, setWaiting] = useState(0);
+  const [approved, setApproved] = useState(0);
+  const [initiated, setInitiated] = useState(0);
+  const [expired, setExpired] = useState(0);
 
   const overlayRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+
+  const cardsData = [
+    {
+      label: "Aguardando",
+      value: waiting,
+      stats: "+55%",
+      icon: IoTimer,
+    },
+    {
+      label: "Iniciados",
+      value: initiated,
+      stats: "0%",
+      icon: IoShieldCheckmark,
+    },
+    {
+      label: "Expirados",
+      value: expired,
+      stats: "0%",
+      icon: IoWarning,
+    },
+    {
+      label: "Aprovados",
+      value: approved,
+      stats: "0%",
+      icon: IoTrophy,
+    },
+  ];
+
+  useEffect(() => {
+    Propostas()
+      .where("status", "==", "Aguardando")
+      .then((prop) => {
+        setWaiting(prop.size);
+      });
+  }, []);
+
+  useEffect(() => {
+    Propostas()
+      .where("status", "==", "Iniciado")
+      .then((prop) => {
+        setInitiated(prop.size);
+      });
+  }, []);
+
+  useEffect(() => {
+    Propostas()
+      .where("status", "==", "Expirado")
+      .then((prop) => {
+        setExpired(prop.size);
+      });
+  }, []);
+
+  useEffect(() => {
+    Propostas()
+      .where("status", "==", "Aprovado")
+      .then((prop) => {
+        setApproved(prop.size);
+      });
+  }, []);
 
   return (
     <Flex flexDirection="column" pt={{ base: "120px", md: "75px" }}>
@@ -94,9 +124,9 @@ const Dashboard = () => {
                       alignSelf="flex-end"
                       justifySelf="flex-end"
                       m="0px"
-                      color={card.stats[0] === "+" ? "green.400" : "red.500"}
+                      color={card.stats[0] !== "-" ? "green.400" : "red.500"}
                       fontWeight="bold"
-                      ps="3px"
+                      ps="10px"
                       fontSize="md"
                     >
                       {card.stats}
@@ -258,13 +288,13 @@ const Dashboard = () => {
               <BarChart />
               <Flex direction="column" mt="24px" mb="36px" alignSelf="flex-start">
                 <Text fontSize="lg" color={textColor} fontWeight="bold" mb="6px">
-                  Active Users
+                  Usuários Ativos
                 </Text>
                 <Text fontSize="md" fontWeight="medium" color="gray.400">
                   <Text as="span" color="green.400" fontWeight="bold">
                     (+23%)
                   </Text>{" "}
-                  than last week
+                  do que a semana passada
                 </Text>
               </Flex>
               <SimpleGrid gap={{ sm: "12px" }} columns={4}>
@@ -332,13 +362,13 @@ const Dashboard = () => {
           <CardHeader mb="20px" pl="22px">
             <Flex direction="column" alignSelf="flex-start">
               <Text fontSize="lg" color={textColor} fontWeight="bold" mb="6px">
-                Sales Overview
+                Taxa de Aprovação
               </Text>
               <Text fontSize="md" fontWeight="medium" color="gray.400">
                 <Text as="span" color="green.400" fontWeight="bold">
-                  (+5%) more
+                  (+5%) a mais
                 </Text>{" "}
-                in 2021
+                em 2022
               </Text>
             </Flex>
           </CardHeader>

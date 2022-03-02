@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface FipeApi {
   nome: string;
   codigo: string | number;
@@ -28,4 +30,14 @@ export interface Routes {
   icon?: JSX.Element;
   component: string;
   layout?: string;
+}
+
+interface Row {
+  fullName: string;
+  cellPhone: string;
+  status: "Iniciado" | "Aprovado" | "Cancelado" | "Expirado" | "Aguardando";
+  photoURL: string;
+  createdAt: Timestamp;
+  expiresIn: Timestamp;
+  id: string;
 }

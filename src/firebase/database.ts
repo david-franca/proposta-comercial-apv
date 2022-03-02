@@ -1,3 +1,4 @@
+import { WhereFilterOp } from "firebase/firestore";
 import { db } from "./clientApp";
 
 const propostas = db.collection("Propostas");
@@ -6,6 +7,9 @@ const configurations = db.collection("Configurations");
 
 export const Propostas = () => ({
   getAll: async () => await propostas.get(),
+
+  where: async (fieldPath: string, whereOptions: WhereFilterOp, value: any) =>
+    await propostas.where(fieldPath, whereOptions, value).get(),
 
   getById: async (id: string) => await propostas.doc(id).get(),
 

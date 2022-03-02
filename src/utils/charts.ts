@@ -3,7 +3,7 @@ import ptBr from "apexcharts/dist/locales/pt-br.json";
 export const barChartData = [
   {
     name: "Sales",
-    data: [330, 250, 110, 300, 490, 350, 270, 130, 425],
+    data: [0, 2, 12],
   },
 ];
 
@@ -24,7 +24,20 @@ export const barChartOptions: ApexCharts.ApexOptions = {
     theme: "dark",
   },
   xaxis: {
-    categories: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    categories: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
     labels: {
       show: false,
       style: {
