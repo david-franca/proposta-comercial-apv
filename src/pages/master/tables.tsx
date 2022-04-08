@@ -1,4 +1,6 @@
 import Container from "../../components/Container/Container";
+import { Head } from "../../components/Head";
+import { withProtected } from "../../hooks/route";
 import TablesView from "../../views/Tables";
 
 const Tables = () => {
@@ -9,4 +11,4 @@ const Tables = () => {
   );
 };
 
-export default Tables;
+export default withProtected(Tables);

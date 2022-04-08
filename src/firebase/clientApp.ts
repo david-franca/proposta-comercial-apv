@@ -1,6 +1,8 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
+import "firebase/firestore";
+import "firebase/auth";
+
+import { getApps } from "firebase/app";
+import { Fuego } from "swr-firestore-v9";
 
 const clientCredentials = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,12 +13,10 @@ const clientCredentials = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = firebase.initializeApp(clientCredentials);
-const auth = app.auth();
-const db = app.firestore();
+let fuego: Fuego;
 
-const logout = () => {
-  auth.signOut();
-};
+if (!getApps.length) {
+  fuego = new Fuego(clientCredentials);
+}
 
-export { auth, db, logout, firebase, app };
+export { fuego };

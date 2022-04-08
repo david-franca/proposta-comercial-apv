@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
-import { useEffect, useRef, useState } from "react";
-import { FaFacebook, FaTwitter } from "react-icons/fa";
+import { useEffect, useRef } from "react";
 import Mask from "react-input-mask";
+import { useDocument } from "swr-firestore-v9";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
@@ -18,21 +18,15 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Icon,
   Input,
-  Link,
-  Switch,
-  Text,
-  useColorMode,
-  useColorModeValue,
   InputGroup,
   InputLeftAddon,
-  NumberInput,
-  NumberInputField,
+  Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
+import authService from "../../service/auth.service";
 import { Separator } from "../Separator/Separator";
-import { Config } from "../../firebase";
 
 Yup.setLocale(ptForm);
 
@@ -58,8 +52,8 @@ export default function Configuration(props: ConfigurationProps) {
   const secondaryButtonBorder = useColorModeValue("gray.700", "white");
   const secondaryButtonColor = useColorModeValue("gray.700", "white");
   const settingsRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const [configuration, setConfiguration] = useState<any[]>([]);
-  const [id, setId] = useState("");
+  const { data, update } =
+    useDocument<{ cellPhone: string; cotaValue: number }>("Configurations/default");
 
   const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
 
@@ -68,29 +62,21 @@ export default function Configuration(props: ConfigurationProps) {
     cotaValue: Yup.number().required().moreThan(0),
   });
 
-  const formik = useFormik({
+  const { errors, handleSubmit, setFieldValue, touched, values, handleChange } = useFormik({
     validationSchema: formSchema,
     initialValues,
     onSubmit: (values) => {
-      Config().update(id, values);
+      update(values);
     },
   });
 
   useEffect(() => {
-    Config()
-      .getAll()
-      .then((config) => {
-        const docs: any[] = [];
-        config.docs.forEach((doc) => {
-          docs.push(doc.data());
-          setId(doc.id);
-        });
-        setConfiguration(docs);
-        formik.setFieldValue("cellPhone", docs[0].cellPhone);
-        formik.setFieldValue("cotaValue", docs[0].cotaValue);
-      });
+    if (data) {
+      setFieldValue("cellPhone", data.cellPhone);
+      setFieldValue("cotaValue", data.cotaValue);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data]);
 
   return (
     <>
@@ -111,21 +97,17 @@ export default function Configuration(props: ConfigurationProps) {
           </DrawerHeader>
           <DrawerBody w="340px" ps="24px" pe="40px">
             <Flex flexDirection="column">
-              <form noValidate onSubmit={formik.handleSubmit}>
+              <form noValidate onSubmit={handleSubmit}>
                 <Box>
                   <FormControl
                     isRequired
-                    isInvalid={formik.touched.cellPhone && Boolean(formik.errors.cellPhone)}
+                    isInvalid={touched.cellPhone && Boolean(errors.cellPhone)}
                     mb="24px"
                   >
                     <FormLabel htmlFor="cellPhone" ms="4px" fontSize="md" fontWeight="600">
                       Telefone do Atendimento
                     </FormLabel>
-                    <Mask
-                      mask="(99) 99999 9999"
-                      value={formik.values.cellPhone}
-                      onChange={formik.handleChange}
-                    >
+                    <Mask mask="(99) 99999 9999" value={values.cellPhone} onChange={handleChange}>
                       {() => (
                         <Input
                           id="cellPhone"
@@ -139,12 +121,15 @@ export default function Configuration(props: ConfigurationProps) {
                       )}
                     </Mask>
                     <FormErrorMessage ms="4px">
-                      {formik.touched.cellPhone && formik.errors.cellPhone}
+                      {touched.cellPhone && errors.cellPhone}
                     </FormErrorMessage>
                   </FormControl>
                 </Box>
                 <Box mt="24px">
-                  <FormControl>
+                  <FormControl
+                    isRequired
+                    isInvalid={touched.cotaValue && Boolean(errors.cotaValue)}
+                  >
                     <FormLabel htmlFor="cotaValue" ms="4px" fontSize="md" fontWeight="600">
                       Valor da Cota
                     </FormLabel>
@@ -163,8 +148,9 @@ export default function Configuration(props: ConfigurationProps) {
                         id="cotaValue"
                         fontSize="sm"
                         borderRadius="15px"
-                        value={formik.values.cotaValue}
-                        onChange={formik.handleChange}
+                        value={values.cotaValue}
+                        type="number"
+                        onChange={handleChange}
                       />
                     </InputGroup>
                   </FormControl>
@@ -182,6 +168,27 @@ export default function Configuration(props: ConfigurationProps) {
                     type="submit"
                   >
                     Salvar
+                  </Button>
+
+                  <Button
+                    w="100%"
+                    mb="16px"
+                    bg="red.400"
+                    color={colorButton}
+                    fontSize="xs"
+                    _hover={{
+                      bg: "red.300",
+                    }}
+                    _active={{
+                      bg: "red.500",
+                    }}
+                    px="30px"
+                    type="button"
+                    onClick={async () => {
+                      await authService.logout();
+                    }}
+                  >
+                    Sair
                   </Button>
                 </Box>
               </form>

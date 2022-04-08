@@ -1,8 +1,18 @@
 import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 import { Flex, Text } from "@chakra-ui/react";
 
-const NextUi: NextPage = () => {
+import { withPublic } from "../hooks/route";
+
+const NextUi = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/login");
+  });
+
   return (
     <Flex>
       <Text>Olá</Text>
@@ -10,4 +20,4 @@ const NextUi: NextPage = () => {
   );
 };
 
-export default NextUi;
+export default withPublic(NextUi);

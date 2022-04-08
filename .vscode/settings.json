@@ -12,9 +12,11 @@
     "firebaseui",
     "firestore",
     "formik",
+    "Fuego",
     "Localizador",
     "monitoramento",
     "nextui",
+    "Preapproved",
     "Rastreamento",
     "semibold"
   ],

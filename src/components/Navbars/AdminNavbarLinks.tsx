@@ -15,7 +15,7 @@ import {
 
 import { Routes } from "../../@types/interfaces";
 import dashRoutes from "../../utils/routes";
-import { SidebarResponsive } from "../Sidebar/Sidebar";
+import { SidebarResponsive } from "../Sidebar/SidebarResponsive";
 
 interface HeaderLinksProp {
   fixed: boolean;
@@ -107,7 +107,7 @@ export default function HeaderLinks(props: HeaderLinksProp) {
           <Text display={{ sm: "none", md: "flex" }}>Sign In</Text>
         </Button>
       </Link> */}
-      <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} />
+      <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="Truck Level" />
       <Icon
         as={IoSettings}
         cursor="pointer"

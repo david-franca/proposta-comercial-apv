@@ -10,7 +10,7 @@ export const globalStyles = {
   styles: {
     global: (props: Dict<any> | StyleFunctionProps) => ({
       body: {
-        bg: mode("gray.200", "gray.800")(props),
+        bg: mode("gray.300", "gray.800")(props),
         fontFamily: "Helvetica, sans-serif",
       },
       html: {

@@ -1,4 +1,5 @@
 import Container from "../../components/Container/Container";
+import { withProtected } from "../../hooks/route";
 import BillingView from "../../views/Billing";
 
 const Billing = () => {
@@ -9,4 +10,4 @@ const Billing = () => {
   );
 };
 
-export default Billing;
+export default withProtected(Billing);

@@ -1,4 +1,5 @@
 import Container from "../../../components/Container/Container";
+import { withProtected } from "../../../hooks/route";
 import HandlingView from "../../../views/Handling";
 
 const Handling = () => {
@@ -9,4 +10,4 @@ const Handling = () => {
   );
 };
 
-export default Handling;
+export default withProtected(Handling);

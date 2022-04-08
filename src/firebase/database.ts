@@ -1,34 +1,56 @@
-import { WhereFilterOp } from "firebase/firestore";
-import { db } from "./clientApp";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+  WhereFilterOp,
+} from "firebase/firestore";
 
-const propostas = db.collection("Propostas");
-const users = db.collection("Users");
-const configurations = db.collection("Configurations");
+import { fuego } from "./clientApp";
+
+const { db } = fuego;
+
+const propostasRef = collection(db, "Propostas");
+const usersRef = collection(db, "Users");
+const configurationsRef = collection(db, "Configurations");
+
+const propostaQuery = query(propostasRef, orderBy("createdAt"));
 
 export const Propostas = () => ({
-  getAll: async () => await propostas.get(),
+  getAll: async () => await getDocs(propostaQuery),
 
   where: async (fieldPath: string, whereOptions: WhereFilterOp, value: any) =>
-    await propostas.where(fieldPath, whereOptions, value).get(),
+    await getDocs(query(propostasRef, where(fieldPath, whereOptions, value))),
 
-  getById: async (id: string) => await propostas.doc(id).get(),
+  getById: async (id: string) => await getDoc(doc(propostasRef, id)),
 
-  create: async (id: string, value: any): Promise<void> => await propostas.doc(id).set(value),
+  create: async (id: string, value: any): Promise<void> =>
+    await setDoc(doc(propostasRef, id), value),
 
-  update: async (id: string, value: any): Promise<void> => await propostas.doc(id).update(value),
+  update: async (id: string, value: any): Promise<void> =>
+    await updateDoc(doc(propostasRef, id), value),
 
-  delete: async (id: string): Promise<void> => await propostas.doc(id).delete(),
+  delete: async (id: string): Promise<void> => await deleteDoc(doc(propostasRef, id)),
+
+  snapshot: (fieldPath: string, whereOptions: WhereFilterOp, value: any) =>
+    query(propostasRef, where(fieldPath, whereOptions, value)),
 });
 
 export const Config = () => ({
-  getAll: async () => await configurations.get(),
+  getAll: async () => await getDocs(query(configurationsRef)),
 
   update: async (id: string, value: any): Promise<void> =>
-    await configurations.doc(id).update(value),
+    await updateDoc(doc(configurationsRef, id), value),
 });
 
 export const Users = () => ({
-  getByCode: async (code: string) => await users.where("code", "==", code).get(),
+  getByCode: async (code: string) => await getDocs(query(usersRef, where("code", "==", code))),
 
-  update: async (id: string, value: any) => await users.doc(id).update(value),
+  update: async (id: string, value: any) => await updateDoc(doc(usersRef, id), value),
 });

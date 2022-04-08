@@ -18,20 +18,19 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-
-import { Row } from "../../@types/interfaces";
+import { Proposal } from "../../@types/interfaces";
+import { Document } from "swr-firestore-v9";
+import axios, { AxiosError } from "axios";
 
 interface TablesRowProps {
-  row: Row;
+  row: Document<Proposal>;
   onClick: (id: string) => void;
 }
 
 function TablesTableRow({ row, onClick }: TablesRowProps) {
-  const { fullName, status, cellPhone, photoURL, createdAt, expiresIn, id } = row;
-  const { colorMode } = useColorMode();
-  const [bgStatus, setBgStatus] = useState("");
+  const { fullName, cellPhone, photoURL, createdAt, expiresIn, id } = row;
   const textColor = useColorModeValue("gray.700", "white");
-  const [statusType, setStatusType] = useState("");
+  const [sourceImage, setSourceImage] = useState("");
   // let bgStatus = useColorModeValue("gray.400", "#1a202c");
 
   const formatCellPhone = (value: string) => {
@@ -41,25 +40,22 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
     return `(${head}) ${number}`;
   };
 
+  const random = () => {
+    return Math.floor(Math.random() * 999);
+  };
+
   useEffect(() => {
-    switch (status) {
-      case "Aguardando":
-        colorMode === "light" ? setBgStatus("#33B5E5") : setBgStatus("#0099CC");
-        break;
-      case "Aprovado":
-        colorMode === "light" ? setBgStatus("#00C851") : setBgStatus("#007E33");
-        break;
-      case "Cancelado":
-        colorMode === "light" ? setBgStatus("#FF4444") : setBgStatus("#CC0000");
-        break;
-      case "Expirado":
-        colorMode === "light" ? setBgStatus("#FFBB33") : setBgStatus("#FF8800");
-        break;
-      case "Iniciado":
-        colorMode === "light" ? setBgStatus("#9545D8") : setBgStatus("#511F7A");
-        break;
+    if (photoURL) {
+      axios
+        .get(photoURL)
+        .then(() => {
+          setSourceImage(photoURL);
+        })
+        .catch(() => {
+          setSourceImage(`https://picsum.photos/id/${random()}/1400`);
+        });
     }
-  }, [colorMode, status]);
+  }, [photoURL]);
 
   /*   useEffect(() => {
     const diff = moment(expiresIn.toMillis()).diff(moment(), "seconds");
@@ -76,7 +72,7 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
     <Tr>
       <Td minWidth={{ sm: "250px" }} pl="0px">
         <Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
-          <Avatar src={photoURL} w="50px" borderRadius="12px" me="18px" />
+          <Avatar src={sourceImage} w="50px" borderRadius="12px" me="18px" />
           <Flex direction="column">
             <Text fontSize="md" color={textColor} fontWeight="bold" minWidth="100%">
               {fullName}
@@ -85,26 +81,13 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
         </Flex>
       </Td>
       <Td>
-        <Badge
-          bg={bgStatus}
-          color="white"
-          fontSize="16px"
-          p="3px 10px"
-          borderRadius="8px"
-          width="100%"
-          textAlign="center"
-        >
-          {status}
-        </Badge>
-      </Td>
-      <Td>
         <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
           {formatCellPhone(cellPhone)}
         </Text>
       </Td>
       <Td>
         <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
-          {moment(createdAt.toDate()).calendar()}
+          {moment(createdAt).calendar()}
         </Text>
       </Td>
       <Td>

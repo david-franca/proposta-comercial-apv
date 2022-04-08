@@ -1,15 +1,17 @@
-import { ChakraProvider, Portal, useDisclosure } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
+import { ChakraProvider, Portal, useDisclosure } from "@chakra-ui/react";
 
 import theme from "../../theme/theme";
 import route from "../../utils/routes";
 import Configuration from "../Configuration/Configuration";
 import Footer from "../Footer/Footer";
+import { Head } from "../Head";
 import MainPanel from "../Layout/MainPanel";
 import PanelContainer from "../Layout/PanelContainer";
 import PanelContent from "../Layout/PanelContent";
 import AdminNavbar from "../Navbars/AdminNavbar";
-import { Sidebar } from "../Sidebar/Sidebar";
+import { Sidebar } from "../Sidebar";
 
 type ContainerProps = PropsWithChildren<{
   name: string;
@@ -21,6 +23,7 @@ const Container = ({ name, children, select }: ContainerProps) => {
 
   return (
     <ChakraProvider theme={theme} resetCSS={false}>
+      <Head title={name} />
       <Sidebar routes={route} selected={select} />
       <MainPanel
         w={{
@@ -31,7 +34,7 @@ const Container = ({ name, children, select }: ContainerProps) => {
         <Portal>
           <AdminNavbar
             onOpen={onOpen}
-            logoText={"PURITY UI DASHBOARD"}
+            logoText={"Truck Level"}
             brandText={name}
             secondary={false}
             fixed={true}

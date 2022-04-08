@@ -1,6 +1,6 @@
-import { Box, BoxProps, useStyleConfig } from "@chakra-ui/react";
+import { Skeleton, SkeletonProps, useStyleConfig } from "@chakra-ui/react";
 
-interface CardProps extends BoxProps {
+interface CardProps extends SkeletonProps {
   variant?: string;
 }
 
@@ -9,9 +9,9 @@ function Card(props: CardProps) {
   const styles = useStyleConfig("Card", { variant });
   // Pass the computed styles into the `__css` prop
   return (
-    <Box __css={styles} {...rest}>
+    <Skeleton __css={styles} isLoaded={true} {...rest}>
       {children}
-    </Box>
+    </Skeleton>
   );
 }
 

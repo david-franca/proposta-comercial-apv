@@ -2,22 +2,28 @@ import "moment/locale/pt-br";
 import "../styles/globals.css";
 
 import moment from "moment";
-import { useRouter } from "next/router";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { FuegoProvider } from "swr-firestore-v9";
 
 import { ChakraProvider } from "@chakra-ui/react";
 
-import { auth } from "../firebase";
+import { AppContextInterface } from "../@types/interfaces";
+import { fuego } from "../firebase";
+import { AuthProvider } from "../hooks/useAuth";
+import AuthStateChanged from "../layout/AuthStateChanged";
 
 import type { AppProps } from "next/app";
-moment.updateLocale("pt-br", {});
+moment.updateLocale("pt-br", null);
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [user, loading] = useAuthState(auth);
-
   return (
     <ChakraProvider>
-      <Component {...pageProps} />
+      <AuthProvider value={{} as AppContextInterface}>
+        <AuthStateChanged>
+          <FuegoProvider fuego={fuego}>
+            <Component {...pageProps} />
+          </FuegoProvider>
+        </AuthStateChanged>
+      </AuthProvider>
     </ChakraProvider>
   );
 }

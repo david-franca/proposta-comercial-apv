@@ -88,36 +88,14 @@ export const barChartOptions: ApexCharts.ApexOptions = {
   ],
 };
 
-export const lineChartData: ApexAxisChartSeries | ApexNonAxisChartSeries = [
+export const lineChartData: ApexAxisChartSeries = [
   {
-    name: "Mobile apps",
-    data: [
-      { x: new Date("2021-01-15"), y: 1 },
-      { x: new Date("2021-02-15"), y: 2 },
-      { x: new Date("2021-03-15"), y: 4 },
-      { x: new Date("2021-04-15"), y: 8 },
-      { x: new Date("2021-05-15"), y: 5 },
-      { x: new Date("2021-06-15"), y: 9 },
-      { x: new Date("2021-07-15"), y: 3 },
-      { x: new Date("2021-08-15"), y: 2 },
-      { x: new Date("2021-09-15"), y: 10 },
-      { x: new Date("2021-10-15"), y: 9 },
-    ],
+    name: "Essa Semana",
+    data: [1, 2, 4, 8, 5, 9, 7],
   },
   {
-    name: "Websites",
-    data: [
-      { x: new Date("2021-01-15"), y: 6 },
-      { x: new Date("2021-02-15"), y: 2 },
-      { x: new Date("2021-03-15"), y: 8 },
-      { x: new Date("2021-04-15"), y: 4 },
-      { x: new Date("2021-05-15"), y: 3 },
-      { x: new Date("2021-06-15"), y: 12 },
-      { x: new Date("2021-07-15"), y: 9 },
-      { x: new Date("2021-08-15"), y: 5 },
-      { x: new Date("2021-09-15"), y: 10 },
-      { x: new Date("2021-10-15"), y: 4 },
-    ],
+    name: "Semana Passada",
+    data: [6, 2, 8, 4, 3, 12, 8],
   },
 ];
 
@@ -128,6 +106,7 @@ export const lineChartOptions: ApexCharts.ApexOptions = {
     },
     defaultLocale: "pt-br",
     locales: [ptBr],
+    type: "area",
   },
   tooltip: {
     theme: "dark",
@@ -139,7 +118,8 @@ export const lineChartOptions: ApexCharts.ApexOptions = {
     curve: "smooth",
   },
   xaxis: {
-    type: "datetime",
+    type: "category",
+    categories: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
     labels: {
       format: "MMMM",
       style: {
