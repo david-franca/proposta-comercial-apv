@@ -2,20 +2,20 @@ import { User } from "firebase/auth";
 import { Dispatch, SetStateAction } from "react";
 
 export interface FipeApi {
-  nome: string;
-  codigo: string | number;
+  name: string;
+  code: string;
 }
 
 export interface FIPE {
-  Valor: string;
-  Marca: string;
-  Modelo: string;
-  AnoModelo: string | number;
-  Combustivel: string;
-  CodigoFipe: string;
-  MesReferencia: string;
-  TipoVeiculo: number;
-  SiglaCombustivel: string;
+  price: string;
+  brand: string;
+  model: string;
+  modelYear: number;
+  fuel: string;
+  codeFipe: string;
+  referenceMonth: string;
+  vehicleType: number;
+  fuelAcronym: string;
 }
 
 export interface Models {

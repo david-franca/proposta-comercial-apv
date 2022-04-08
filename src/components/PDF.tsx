@@ -109,15 +109,15 @@ Font.register({
 const dateLong = new Date().toLocaleDateString("pt-br", { dateStyle: "long" });
 
 const fipeDefault: FIPE = {
-  Valor: "",
-  Marca: "",
-  Modelo: "",
-  AnoModelo: "",
-  Combustivel: "",
-  CodigoFipe: "",
-  MesReferencia: "",
-  TipoVeiculo: 0,
-  SiglaCombustivel: "",
+  price: "",
+  brand: "",
+  model: "",
+  modelYear: 0,
+  fuel: "",
+  codeFipe: "",
+  referenceMonth: "",
+  vehicleType: 0,
+  fuelAcronym: "",
 };
 
 const pdfDefault = {
@@ -174,11 +174,11 @@ export const PDFDoc = () => {
           <View id="vehicles" style={{ paddingVertical: 10 }}>
             <View id="model" style={[styles.row, styles.background]}>
               <Text style={[styles.bold]}>Veículo: </Text>
-              <Text>{`${fipe.Marca} ${fipe.Modelo} ${fipe.AnoModelo}`}</Text>
+              <Text>{`${fipe.brand} ${fipe.model} ${fipe.modelYear}`}</Text>
             </View>
             <View style={[styles.row, styles.background, { alignSelf: "center" }]}>
               <Text style={styles.bold}>Fipe: </Text>
-              <Text>{fipe.Valor}</Text>
+              <Text>{fipe.price}</Text>
             </View>
           </View>
           <View id="subtitle" style={{ paddingVertical: 10, alignSelf: "flex-start" }}>

@@ -65,20 +65,16 @@ const initialValues: FormValues = {
 };
 
 const fipeDefault: FIPE = {
-  Valor: "",
-  Marca: "",
-  Modelo: "",
-  AnoModelo: "",
-  Combustivel: "",
-  CodigoFipe: "",
-  MesReferencia: "",
-  TipoVeiculo: 0,
-  SiglaCombustivel: "",
+  price: "",
+  brand: "",
+  model: "",
+  modelYear: 0,
+  fuel: "",
+  codeFipe: "",
+  referenceMonth: "",
+  vehicleType: 0,
+  fuelAcronym: "",
 };
-
-const dateLong = new Date().toLocaleDateString("pt-br", {
-  dateStyle: "long",
-});
 
 const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
 
@@ -282,7 +278,7 @@ const Handling = ({ id }: HandlingProps) => {
   // Get the brands os trucks
   useEffect(() => {
     fipeAPI
-      .get(`caminhoes/marcas`)
+      .get(`trucks/brands`)
       .then(({ data }: AxiosResponse<FipeApi[]>) => {
         setFetchedBrands(data);
       })
@@ -294,15 +290,16 @@ const Handling = ({ id }: HandlingProps) => {
           isClosable: true,
         });
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Get the models of trucks based on brand
   useEffect(() => {
     const brand = formik.values.brand;
     if (brand) {
       fipeAPI
-        .get(`caminhoes/marcas/${brand}/modelos`)
-        .then(({ data }: AxiosResponse<Models>) => {
-          setFetchedModels(data.modelos);
+        .get(`trucks/brands/${brand}/models`)
+        .then(({ data }: AxiosResponse<FipeApi[]>) => {
+          setFetchedModels(data);
         })
         .catch((e: AxiosError) => {
           setToastMessage({
@@ -322,7 +319,7 @@ const Handling = ({ id }: HandlingProps) => {
 
     if (model) {
       fipeAPI
-        .get(`caminhoes/marcas/${brand}/modelos/${model}/anos`)
+        .get(`trucks/brands/${brand}/models/${model}/years`)
         .then(({ data }: AxiosResponse<FipeApi[]>) => {
           setFetchedYears(data);
         })
@@ -344,9 +341,10 @@ const Handling = ({ id }: HandlingProps) => {
     const year = formik.values.year;
     if (year) {
       fipeAPI
-        .get(`caminhoes/marcas/${brand}/modelos/${model}/anos/${year}`)
+        .get(`trucks/brands/${brand}/models/${model}/years/${year}`)
         .then(({ data }: AxiosResponse<FIPE>) => {
-          formik.setFieldValue("fipe", currencyToNumber(data.Valor));
+          console.log(data);
+          formik.setFieldValue("fipe", currencyToNumber(data.price));
           setFipeData(data);
           setFipe(data);
         })
@@ -607,11 +605,12 @@ const Handling = ({ id }: HandlingProps) => {
                 fontSize="sm"
                 borderRadius="15px"
                 size="lg"
+                isDisabled={fetchedBrands.length === 0}
               >
                 <option defaultValue="">Selecione uma Marca</option>
                 {fetchedBrands.map((brands, index) => (
-                  <option value={brands.codigo} key={index}>
-                    {brands.nome}
+                  <option value={brands.code} key={index}>
+                    {brands.name}
                   </option>
                 ))}
                 <FormErrorMessage ms="4px">
@@ -625,11 +624,12 @@ const Handling = ({ id }: HandlingProps) => {
                 fontSize="sm"
                 borderRadius="15px"
                 size="lg"
+                isDisabled={fetchedModels.length === 0}
               >
                 <option defaultValue="">Selecione um Modelo</option>
                 {fetchedModels.map((models, index) => (
-                  <option value={models.codigo} key={index}>
-                    {models.nome}
+                  <option value={models.code} key={index}>
+                    {models.name}
                   </option>
                 ))}
                 <FormErrorMessage ms="4px">
@@ -643,11 +643,12 @@ const Handling = ({ id }: HandlingProps) => {
                 fontSize="sm"
                 borderRadius="15px"
                 size="lg"
+                isDisabled={fetchedYears.length === 0}
               >
                 <option defaultValue="">Selecione um Ano</option>
                 {fetchedYears.map((years, index) => (
-                  <option value={years.codigo} key={index}>
-                    {years.nome === "32000" ? "Zero Km" : years.nome}
+                  <option value={years.code} key={index}>
+                    {years.name === "32000" ? "Zero Km" : years.name}
                   </option>
                 ))}
                 <FormErrorMessage ms="4px">
