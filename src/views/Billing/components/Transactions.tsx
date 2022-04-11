@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowDown, FaArrowUp, FaRegCalendarAlt } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
-import { Document, useCollection } from "swr-firestore-v9";
+import { Document, useCollection } from "../../../lib";
 
 // Chakra imports
 import { Center, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react";
 
 import { Transaction, Withdrawals } from "../../../@types/interfaces";
 // Custom components
-import Card from "../../../components/Card/Card";
-import CardBody from "../../../components/Card/CardBody";
-import CardHeader from "../../../components/Card/CardHeader";
-import TransactionRow from "../../../components/Tables/TransactionRow";
-import Empty from "../../../components/Empty";
+import { Card, CardBody, CardHeader, Empty, TransactionRow } from "../../../components";
 
 interface TransactionsProps {
   title: string;

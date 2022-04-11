@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Document, useCollection } from "swr-firestore-v9";
+import { Document, useCollection } from "../../lib";
 
 import { Flex, Grid } from "@chakra-ui/react";
 

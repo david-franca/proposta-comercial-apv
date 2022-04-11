@@ -1,10 +1,11 @@
 import { AxiosError, AxiosResponse } from "axios";
 import currency from "currency.js";
 import { useFormik } from "formik";
+import moment from "moment";
 import NP from "number-precision";
 import { useEffect, useMemo, useState } from "react";
 import { IoLogoWhatsapp } from "react-icons/io5";
-import Mask from "react-input-mask";
+import { useCollection, useDocument } from "../../lib";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
@@ -12,28 +13,31 @@ import {
   Button,
   chakra,
   Checkbox,
-  Collapse,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input,
   Radio,
   RadioGroup,
   Select,
   SimpleGrid,
   Stack,
-  Switch,
   Text,
   useColorModeValue,
   useToast,
   UseToastOptions,
 } from "@chakra-ui/react";
 
-import { FIPE, FipeApi, FormValues, Models, Status } from "../../@types/interfaces";
-import { Propostas } from "../../firebase";
+import {
+  DefaultAuthProps,
+  FIPE,
+  FipeApi,
+  FormValues,
+  Proposal,
+  Status,
+} from "../../@types/interfaces";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { capitalizeWords, currencyToNumber, fipeAPI } from "../../utils";
+import { capitalizeWords, createLink, currencyToNumber, fipeAPI } from "../../utils";
 import { InputForm } from "./components/Input";
 import { MaskedInputField } from "./components/MaskedInputField";
 import { MoneyInputField } from "./components/MoneyInputField";
@@ -78,11 +82,11 @@ const fipeDefault: FIPE = {
 
 const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
 
-interface HandlingProps {
+type HandlingProps = DefaultAuthProps & {
   id?: string;
-}
+};
 
-const Handling = ({ id }: HandlingProps) => {
+const Handling = ({ id, auth }: HandlingProps) => {
   const toast = useToast();
   const [toastMessage, setToastMessage] = useState<UseToastOptions>();
   const titleColor = useColorModeValue("teal.300", "teal.200");
@@ -140,72 +144,51 @@ const Handling = ({ id }: HandlingProps) => {
   const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", fipeDefault);
   const [fipe, setFipe] = useState(fipeDefault);
 
-  // const [proposal, proposalLoading, proposalError] = useCollection(db.collection("proposal"), {});
+  const { data: proposal, update } = useDocument<Proposal>(id ? `Propostas/${id}` : null, {
+    parseDates: ["createdAt"],
+  });
+  const { add } = useCollection<Proposal>("Propostas", {
+    parseDates: ["createdAt"],
+  });
 
-  /* const addProposal = async (proposal: FormValues) => {
+  const addProposal = async (proposal: FormValues) => {
+    const user = auth.user;
+    const today = moment();
+    const proposalRaw: Proposal = {
+      createdAt: today.toDate(),
+      updatedAt: today.toDate(),
+      expiresIn: today.add(5, "days").toDate(),
+      fullName: capitalizeWords(proposal.fullName),
+      cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
+      email: proposal.email,
+      licensePlate: proposal.licensePlate,
+      brand: proposal.brand,
+      model: proposal.model,
+      year: proposal.year,
+      fipe: currency(proposal.fipe).value,
+      bodywork: currency(proposal.bodywork).value,
+      protected: currency(proposal.protected).value,
+      admin: currency(proposal.admin).value,
+      theft: currency(proposal.theft).value,
+      total: currency(proposal.total).value,
+      accession: currency(proposal.accession).value,
+      inspection: currency(proposal.inspection).value,
+      installation: currency(proposal.installation).value,
+      discount: Number(proposal.discount),
+      cotas: proposal.cotas,
+    };
     try {
       setLoading(true);
       if (user && !id) {
-        const id = v4();
-        const today = moment();
-
-        await Propostas().create(id, {
-          createdBy: user.uid,
-          createdAt: Timestamp.fromDate(today.toDate()),
-          updatedAt: Timestamp.fromDate(today.toDate()),
-          expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
-          fullName: capitalizeWords(proposal.fullName),
-          cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
-          email: proposal.email,
-          licensePlate: proposal.licensePlate,
-          brand: proposal.brand,
-          model: proposal.model,
-          year: proposal.year,
-          fipe: Number(proposal.fipe),
-          bodywork: Number(proposal.bodywork),
-          protected: proposal.protected,
-          discount: Number(proposal.discount),
-          admin: Number(proposal.admin),
-          theft: Number(proposal.theft),
-          total: proposal.total,
-          accession: proposal.accession,
-          inspection: proposal.inspection,
-          installation: proposal.installation,
-          cotas: proposal.cotas,
-        });
+        await add(proposalRaw);
       }
-
       if (user && id) {
-        const today = moment();
+        delete proposalRaw.createdAt;
+        proposalRaw.status = "Iniciado";
 
-        const data = {
-          createdBy: user.uid,
-          updatedAt: Timestamp.fromDate(today.toDate()),
-          expiresIn: Timestamp.fromDate(today.add(5, "days").toDate()),
-          fullName: capitalizeWords(proposal.fullName),
-          cellPhone: proposal.cellPhone.replace(/[^0-9,]+/g, ""),
-          email: proposal.email,
-          licensePlate: proposal.licensePlate,
-          brand: proposal.brand,
-          model: proposal.model,
-          year: proposal.year,
-          fipe: Number(proposal.fipe),
-          bodywork: Number(proposal.bodywork),
-          protected: proposal.protected,
-          discount: Number(proposal.discount),
-          admin: Number(proposal.admin),
-          theft: Number(proposal.theft),
-          total: proposal.total,
-          accession: proposal.accession,
-          inspection: proposal.inspection,
-          installation: proposal.installation,
-          cotas: proposal.cotas,
-          status: "Iniciado",
-        };
+        await update(proposalRaw);
 
-        await Propostas().update(id, data);
-
-        if (statusProposta === "Aguardando") {
+        /*         if (statusProposta === "Aguardando") {
           const userSnapshot = await Users().getByCode(userCode);
           console.log("userByCode", userSnapshot.size);
           userSnapshot.forEach(async (doc) => {
@@ -219,14 +202,14 @@ const Handling = ({ id }: HandlingProps) => {
               });
             }
           });
-        }
+        } */
       }
 
       setLoading(false);
     } catch (error) {
       setLoading(false);
     }
-  }; */
+  };
 
   const total = useMemo(
     () =>
@@ -258,13 +241,13 @@ const Handling = ({ id }: HandlingProps) => {
     [admin, formik.values.theft, planValue, rateio]
   );
 
-  /*   const openInNewTab = (): void => {
+  const openInNewTab = (): void => {
     if (Object.keys(formik.errors).length === 0) {
       const url = createLink(
         {
           admin: Number(admin),
           phone: formik.values.cellPhone.replace(/[^0-9,]+/g, ""),
-          theft: parseInt(formik.values.theft),
+          theft: formik.values.theft,
           cota: Number(formik.values.cotas),
           total,
         },
@@ -273,7 +256,7 @@ const Handling = ({ id }: HandlingProps) => {
       const newWindow = window.open(url, "_blank", "noopener,noreferrer");
       if (newWindow) newWindow.opener = null;
     }
-  }; */
+  };
 
   // Get the brands os trucks
   useEffect(() => {
@@ -343,7 +326,6 @@ const Handling = ({ id }: HandlingProps) => {
       fipeAPI
         .get(`trucks/brands/${brand}/models/${model}/years/${year}`)
         .then(({ data }: AxiosResponse<FIPE>) => {
-          console.log(data);
           formik.setFieldValue("fipe", currencyToNumber(data.price));
           setFipeData(data);
           setFipe(data);
@@ -382,7 +364,6 @@ const Handling = ({ id }: HandlingProps) => {
   }, [formik.values.bodywork]);
 
   useEffect(() => {
-    console.log(radioValue);
     formik.setFieldValue("theft", radioValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [radioValue]);
@@ -483,40 +464,35 @@ const Handling = ({ id }: HandlingProps) => {
   }, [toastMessage]);
 
   useEffect(() => {
-    if (id) {
-      Propostas()
-        .getById(id)
-        .then((value) => {
-          if (value.exists()) {
-            const proposta = value.data();
-            const head = String(proposta.cellPhone).substring(0, 2); // 85
-            const body1 = String(proposta.cellPhone).substring(2, 7);
-            const body2 = String(proposta.cellPhone).substring(7, 11);
-            const cellPhone = `(${head}) ${body1} ${body2}`;
+    if (id && proposal) {
+      if (proposal.exists) {
+        const head = String(proposal.cellPhone).substring(0, 2); // 85
+        const body1 = String(proposal.cellPhone).substring(2, 7);
+        const body2 = String(proposal.cellPhone).substring(7, 11);
+        const cellPhone = `(${head}) ${body1} ${body2}`;
 
-            formik.setFieldValue("cellPhone", cellPhone ?? "");
-            formik.setFieldValue("fullName", proposta.fullName ?? "");
-            formik.setFieldValue("email", proposta.email ?? "");
-            formik.setFieldValue("licensePlate", proposta.licensePlate ?? "");
-            formik.setFieldValue("brand", proposta.brand ?? "");
-            formik.setFieldValue("model", proposta.model ?? "");
-            formik.setFieldValue("year", proposta.year ?? "");
-            formik.setFieldValue("fipe", Number(proposta.fipe ?? 0));
-            formik.setFieldValue("bodywork", Number(proposta.bodywork ?? 0));
-            formik.setFieldValue("protected", proposta.protected ?? "");
-            formik.setFieldValue("discount", Number(proposta.discount ?? 0));
-            formik.setFieldValue("admin", Number(proposta.admin ?? 0));
-            formik.setFieldValue("theft", Number(proposta.theft ?? 0));
-            formik.setFieldValue("total", proposta.total ?? "");
-            formik.setFieldValue("accession", proposta.accession ?? "");
-            formik.setFieldValue("inspection", proposta.inspection ?? "");
-            formik.setFieldValue("installation", proposta.installation ?? "");
-            formik.setFieldValue("cotas", proposta.cotas ?? "");
-            setUserCode(proposta.code ?? "");
-            setLoading(false);
-            setStatusProposta(proposta.status);
-          }
-        });
+        formik.setFieldValue("cellPhone", cellPhone ?? "");
+        formik.setFieldValue("fullName", proposal.fullName ?? "");
+        formik.setFieldValue("email", proposal.email ?? "");
+        formik.setFieldValue("licensePlate", proposal.licensePlate ?? "");
+        formik.setFieldValue("brand", proposal.brand ?? "");
+        formik.setFieldValue("model", proposal.model ?? "");
+        formik.setFieldValue("year", proposal.year ?? "");
+        formik.setFieldValue("fipe", proposal.fipe ?? 0);
+        formik.setFieldValue("bodywork", proposal.bodywork ?? 0);
+        formik.setFieldValue("protected", proposal.protected ?? "");
+        formik.setFieldValue("discount", proposal.discount ?? 0);
+        formik.setFieldValue("admin", proposal.admin ?? 0);
+        formik.setFieldValue("theft", proposal.theft ?? 0);
+        formik.setFieldValue("total", proposal.total ?? 0);
+        formik.setFieldValue("accession", proposal.accession ?? 0);
+        formik.setFieldValue("inspection", proposal.inspection ?? 0);
+        formik.setFieldValue("installation", proposal.installation ?? 0);
+        formik.setFieldValue("cotas", proposal.cotas ?? 0);
+        setUserCode(proposal.code ?? "");
+        setLoading(false);
+        setStatusProposta(proposal.status ?? "Aguardando");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -534,7 +510,7 @@ const Handling = ({ id }: HandlingProps) => {
             touched={formik.touched.fullName}
             errors={formik.errors.fullName}
             handleChange={formik.handleChange}
-            values={capitalizeWords(formik.values.fullName)}
+            values={formik.values.fullName}
             placeholder="Nome Completo"
             isRequired
             type="text"
@@ -847,13 +823,13 @@ const Handling = ({ id }: HandlingProps) => {
           fontSize="15px"
           color="white"
           fontWeight="bold"
-          // isLoading={loading}
+          isLoading={loading}
           loadingText="Aguarde"
           w="100%"
           h="45"
           mb="24px"
           leftIcon={<CIoLogoWhatsapp />}
-          /* onClick={() => openInNewTab()} */
+          onClick={() => openInNewTab()}
           _hover={{
             bg: "teal.200",
           }}

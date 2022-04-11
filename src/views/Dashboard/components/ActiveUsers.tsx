@@ -1,11 +1,8 @@
-import { IoCart, IoFileTray, IoRocket, IoStatsChart, IoWallet } from "react-icons/io5";
+import { IoFileTray } from "react-icons/io5";
 
-import { Center, Flex, Icon, SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import { Center, Icon, Text, useColorModeValue } from "@chakra-ui/react";
 
-import Card from "../../../components/Card/Card";
-import CardBody from "../../../components/Card/CardBody";
-import BarChart from "../../../components/Charts/BarChart";
-import ChartStatistics from "./ChartStatistics";
+import { Card, CardBody } from "../../../components";
 
 interface ActiveUsersProps {
   title: string;

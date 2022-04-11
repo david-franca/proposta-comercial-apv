@@ -60,13 +60,12 @@ export interface DefaultAuthProps {
 export interface Proposal {
   fullName: string;
   cellPhone: string;
-  photoURL: string;
-  status: Status;
-  code: string;
+  status?: Status;
+  photoURL?: string;
+  code?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  createdBy?: string;
-  accession?: string;
+  accession?: number;
   admin?: number;
   bodywork?: number;
   brand?: string;
@@ -75,11 +74,11 @@ export interface Proposal {
   email?: string;
   expiresIn?: Date;
   fipe?: number;
-  inspection?: string;
-  installation?: string;
+  inspection?: number;
+  installation?: number;
   licensePlate?: string;
   model?: string;
-  protected?: string;
+  protected?: number;
   theft?: number;
   total?: number;
   year?: string;

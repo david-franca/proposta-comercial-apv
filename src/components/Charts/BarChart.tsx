@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-import Card from "../../components/Card/Card";
+import { Card } from "../../components";
 import { barChartData, barChartOptions } from "../../utils/charts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -32,5 +32,3 @@ export const BarChart = () => {
     </Card>
   );
 };
-
-export default BarChart;

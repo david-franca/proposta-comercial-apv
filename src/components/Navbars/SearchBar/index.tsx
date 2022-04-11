@@ -15,7 +15,7 @@ interface SearchBarProps {
   variant?: string;
 }
 
-export function SearchBar(props: SearchBarProps) {
+export const SearchBar = (props: SearchBarProps) => {
   // Pass the computed styles into the `__css` prop
 
   // Chakra Color Mode
@@ -53,4 +53,4 @@ export function SearchBar(props: SearchBarProps) {
       <Input fontSize="xs" py="11px" placeholder="Digite aqui..." borderRadius="inherit" />
     </InputGroup>
   );
-}
+};

@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { Document } from "swr-firestore-v9";
+import { Document } from "../../../lib";
 
 import { Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 
 import { Users } from "../../../@types/interfaces";
-import Card from "../../../components/Card/Card";
-import CardHeader from "../../../components/Card/CardHeader";
-import LineChart from "../../../components/Charts/LineChart";
+import { Card, CardHeader, LineChart } from "../../../components";
 import { userByWeek } from "../../../utils/random";
 
 interface PassRateProps {
@@ -21,6 +19,10 @@ const PassRate = ({ title, isLoaded, users }: PassRateProps) => {
 
   const getPercentageChange = (oldNumber: number, newNumber: number) => {
     const decreaseValue = newNumber - oldNumber;
+
+    if (oldNumber === 0 && newNumber === 0) {
+      return 0;
+    }
 
     return (decreaseValue / oldNumber) * 100;
   };

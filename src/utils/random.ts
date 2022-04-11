@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Document } from "swr-firestore-v9";
+import { Document } from "../lib";
 
 import { Users } from "../@types/interfaces";
 

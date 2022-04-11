@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import { useEffect, useRef } from "react";
-import Mask from "react-input-mask";
-import { useDocument } from "swr-firestore-v9";
+import TextMaskedInput from "react-text-mask";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
@@ -26,7 +25,8 @@ import {
 } from "@chakra-ui/react";
 
 import authService from "../../service/auth.service";
-import { Separator } from "../Separator/Separator";
+import { Separator } from "../Separator";
+import { useDocument } from "../../lib";
 
 Yup.setLocale(ptForm);
 
@@ -40,7 +40,7 @@ const initialValues = {
   cotaValue: 0,
 };
 
-export default function Configuration(props: ConfigurationProps) {
+export const Configuration = (props: ConfigurationProps): JSX.Element => {
   const { isOpen, onClose } = props;
 
   let bgButton = useColorModeValue(
@@ -48,12 +48,10 @@ export default function Configuration(props: ConfigurationProps) {
     "white"
   );
   let colorButton = useColorModeValue("white", "gray.700");
-  const secondaryButtonBg = useColorModeValue("white", "transparent");
-  const secondaryButtonBorder = useColorModeValue("gray.700", "white");
-  const secondaryButtonColor = useColorModeValue("gray.700", "white");
   const settingsRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const { data, update } =
-    useDocument<{ cellPhone: string; cotaValue: number }>("Configurations/default");
+  const { data, update } = useDocument<{ cellPhone: string; cotaValue: number }>(
+    "Configurations/default"
+  );
 
   const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
 
@@ -81,6 +79,7 @@ export default function Configuration(props: ConfigurationProps) {
   return (
     <>
       <Drawer
+        id="configuration-drawer"
         isOpen={isOpen}
         onClose={onClose}
         placement={"right"}
@@ -107,7 +106,37 @@ export default function Configuration(props: ConfigurationProps) {
                     <FormLabel htmlFor="cellPhone" ms="4px" fontSize="md" fontWeight="600">
                       Telefone do Atendimento
                     </FormLabel>
-                    <Mask mask="(99) 99999 9999" value={values.cellPhone} onChange={handleChange}>
+                    <Input
+                      as={TextMaskedInput}
+                      guide
+                      id="cellPhone"
+                      fontSize="sm"
+                      ms="4px"
+                      borderRadius="15px"
+                      type="text"
+                      placeholder="Seu telefone"
+                      size="lg"
+                      value={values.cellPhone}
+                      onChange={handleChange}
+                      mask={[
+                        "(",
+                        /[1-9]/,
+                        /\d/,
+                        ")",
+                        " ",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        " ",
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                      ]}
+                    />
+                    {/* <Mask mask="(99) 99999 9999" value={values.cellPhone} onChange={handleChange}>
                       {() => (
                         <Input
                           id="cellPhone"
@@ -119,7 +148,7 @@ export default function Configuration(props: ConfigurationProps) {
                           size="lg"
                         />
                       )}
-                    </Mask>
+                    </Mask> */}
                     <FormErrorMessage ms="4px">
                       {touched.cellPhone && errors.cellPhone}
                     </FormErrorMessage>
@@ -171,6 +200,7 @@ export default function Configuration(props: ConfigurationProps) {
                   </Button>
 
                   <Button
+                    id="logout"
                     w="100%"
                     mb="16px"
                     bg="red.400"
@@ -198,4 +228,4 @@ export default function Configuration(props: ConfigurationProps) {
       </Drawer>
     </>
   );
-}
+};

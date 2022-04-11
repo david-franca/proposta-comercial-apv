@@ -1,16 +1,7 @@
 import React, { ChangeEvent } from "react";
-import TextMaskedInput, { Mask, MaskedInputProps as TextMaskedInputProps } from "react-text-mask";
+import { Mask } from "react-text-mask";
 
-// import Mask, { Props } from "react-input-mask";
-import {
-  FormControl,
-  FormControlProps,
-  FormErrorMessage,
-  FormLabel,
-  FormLabelProps,
-  Input,
-  InputProps,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 
 import { MaskedInput } from "./MaskedInput";
 

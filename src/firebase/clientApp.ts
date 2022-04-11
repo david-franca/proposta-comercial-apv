@@ -1,10 +1,11 @@
-import "firebase/firestore";
 import "firebase/auth";
+import "firebase/firestore";
 
-import { getApps } from "firebase/app";
-import { Fuego } from "swr-firestore-v9";
+import { FirebaseOptions, initializeApp } from "firebase/app";
 
-const clientCredentials = {
+import { Fuego } from "../lib";
+
+const clientCredentials: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -12,11 +13,6 @@ const clientCredentials = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
-
-let fuego: Fuego;
-
-if (!getApps.length) {
-  fuego = new Fuego(clientCredentials);
-}
+const fuego = new Fuego(clientCredentials, "next_app");
 
 export { fuego };

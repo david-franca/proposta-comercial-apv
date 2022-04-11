@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaCheck, FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import { Document, useCollection, useDocument } from "swr-firestore-v9";
+import { FaCheck, FaTrashAlt } from "react-icons/fa";
 
 import {
   AccordionButton,
@@ -17,6 +16,7 @@ import {
 
 import { StatusPayment, Withdrawals } from "../../@types/interfaces";
 import useAuth from "../../hooks/useAuth";
+import { Document, useCollection, useDocument } from "../../lib";
 import { currencyBRL } from "../../utils";
 
 interface BillingRowProps {
@@ -28,7 +28,7 @@ interface BillingRowProps {
   uid: string;
 }
 
-const BillingRow = ({ name, createdAt, email, value, status, uid }: BillingRowProps) => {
+export const BillingRow = ({ name, createdAt, email, value, status, uid }: BillingRowProps) => {
   const bgColor = useColorModeValue("#F8F9FA", "gray.800");
   const nameColor = useColorModeValue("gray.500", "white");
   const { update, data } = useDocument<Withdrawals>(`/Withdrawals/${uid}`);
@@ -108,5 +108,3 @@ const BillingRow = ({ name, createdAt, email, value, status, uid }: BillingRowPr
     </AccordionItem>
   );
 };
-
-export default BillingRow;

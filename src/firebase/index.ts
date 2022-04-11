@@ -1,2 +1,2 @@
 export * from "./clientApp";
-export * from "./database";
+export * from "./errorHandling";

@@ -5,12 +5,10 @@ interface LinkProps {
   children: any;
 }
 
-const Link = ({ href, children }: LinkProps) => {
+export const Link = ({ href, children }: LinkProps) => {
   return (
     <NextLink href={href} passHref>
       <a>{children}</a>
     </NextLink>
   );
 };
-
-export default Link;

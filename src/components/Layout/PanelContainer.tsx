@@ -4,7 +4,7 @@ interface PanelContainerProps extends BoxProps {
   variant?: string;
 }
 
-const PanelContainer = (props: PanelContainerProps) => {
+export const PanelContainer = (props: PanelContainerProps) => {
   const { variant, children, ...rest } = props;
   const styles = useStyleConfig("PanelContainer", { variant });
   // Pass the computed styles into the `__css` prop
@@ -14,5 +14,3 @@ const PanelContainer = (props: PanelContainerProps) => {
     </Box>
   );
 };
-
-export default PanelContainer;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Document, useCollection } from "swr-firestore-v9";
+import { Document, useCollection } from "../lib";
 
 import {
   Flex,
@@ -17,9 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Proposal } from "../@types/interfaces";
-import Card from "../components/Card/Card";
-import CardBody from "../components/Card/CardBody";
-import TablesTableRow from "../components/Tables/TablesTableRow";
+import { Card, CardBody, TablesTableRow } from "../components";
 
 const Tables = () => {
   const [tablesData, setTablesData] = useState<Document<Proposal>[]>([]);

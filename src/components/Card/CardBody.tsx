@@ -4,7 +4,7 @@ interface CardBodyProps extends BoxProps {
   variant?: string;
 }
 
-function CardBody(props: CardBodyProps) {
+export const CardBody = (props: CardBodyProps) => {
   const { variant, children, ...rest } = props;
   const styles = useStyleConfig("CardBody", { variant });
   // Pass the computed styles into the `__css` prop
@@ -13,6 +13,4 @@ function CardBody(props: CardBodyProps) {
       {children}
     </Box>
   );
-}
-
-export default CardBody;
+};

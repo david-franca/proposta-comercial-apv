@@ -1,10 +1,11 @@
+import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { IconType } from "react-icons";
 
 import { Box, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react";
-import { IconType } from "react-icons";
-import moment from "moment";
+
+import { useDocument } from "../../lib";
 import { currencyBRL } from "../../utils";
-import { useDocument } from "swr-firestore-v9";
 
 interface TransactionRowProps {
   name: string;
@@ -13,7 +14,7 @@ interface TransactionRowProps {
   price: string;
 }
 
-const TransactionRow = (props: TransactionRowProps) => {
+export const TransactionRow = (props: TransactionRowProps) => {
   const textColor = useColorModeValue("gray.700", "white");
   const { name, date, logo, price } = props;
   const [userId, setUserId] = useState();
@@ -59,5 +60,3 @@ const TransactionRow = (props: TransactionRowProps) => {
     </Flex>
   );
 };
-
-export default TransactionRow;

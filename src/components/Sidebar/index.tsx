@@ -1,12 +1,8 @@
-import NextLink from "next/link";
-import { useRouter } from "next/router";
 import React, { useRef } from "react";
 
-import { Box, Button, Flex, Image, Link, Stack, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
 
-import IconBox from "../Icons/IconBox";
-import { Separator } from "../Separator/Separator";
-import SidebarContent from "./SidebarContent";
+import { SidebarContent } from "./SidebarContent";
 
 interface Routes {
   category?: string;

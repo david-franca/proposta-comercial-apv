@@ -4,8 +4,8 @@ import { useRouter } from "next/router";
 import { Box, Button, Flex, Image, Link, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 
 import { Routes } from "../../@types/interfaces";
-import IconBox from "../Icons/IconBox";
-import { Separator } from "../Separator/Separator";
+import { IconBox } from "../Icons/IconBox";
+import { Separator } from "../Separator";
 
 interface SidebarContendProps {
   routes: Routes[];
@@ -14,7 +14,12 @@ interface SidebarContendProps {
   logoText: string;
 }
 
-const SidebarContent = ({ routes, selected, variantChange, logoText }: SidebarContendProps) => {
+export const SidebarContent = ({
+  routes,
+  selected,
+  variantChange,
+  logoText,
+}: SidebarContendProps) => {
   const router = useRouter();
 
   const swithPage = (page: string) => {
@@ -32,7 +37,7 @@ const SidebarContent = ({ routes, selected, variantChange, logoText }: SidebarCo
     return routes.map((route, index) => {
       if (route.component == selected) {
         return (
-          <NextLink href={`/master/${route.component}`} key={index}>
+          <NextLink passHref href={`/master/${route.component}`} key={index}>
             <Button
               key={index}
               onClick={() => swithPage(route.component)}
@@ -84,7 +89,7 @@ const SidebarContent = ({ routes, selected, variantChange, logoText }: SidebarCo
         );
       }
       return (
-        <NextLink href={`/master/${route.component}`} key={index}>
+        <NextLink passHref href={`/master/${route.component}`} key={index}>
           <Button
             key={index}
             onClick={() => swithPage(route.component)}
@@ -165,5 +170,3 @@ const SidebarContent = ({ routes, selected, variantChange, logoText }: SidebarCo
     </>
   );
 };
-
-export default SidebarContent;

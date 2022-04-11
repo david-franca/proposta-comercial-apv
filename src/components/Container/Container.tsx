@@ -4,13 +4,13 @@ import { ChakraProvider, Portal, useDisclosure } from "@chakra-ui/react";
 
 import theme from "../../theme/theme";
 import route from "../../utils/routes";
-import Configuration from "../Configuration/Configuration";
-import Footer from "../Footer/Footer";
+import { Configuration } from "../Configuration";
+import { Footer } from "../Footer";
 import { Head } from "../Head";
-import MainPanel from "../Layout/MainPanel";
-import PanelContainer from "../Layout/PanelContainer";
-import PanelContent from "../Layout/PanelContent";
-import AdminNavbar from "../Navbars/AdminNavbar";
+import { MainPanel } from "../Layout/MainPanel";
+import { PanelContainer } from "../Layout/PanelContainer";
+import { PanelContent } from "../Layout/PanelContent";
+import { AdminNavbar } from "../Navbars/AdminNavbar";
 import { Sidebar } from "../Sidebar";
 
 type ContainerProps = PropsWithChildren<{
@@ -18,7 +18,7 @@ type ContainerProps = PropsWithChildren<{
   select: string;
 }>;
 
-const Container = ({ name, children, select }: ContainerProps) => {
+export const Container = ({ name, children, select }: ContainerProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -50,5 +50,3 @@ const Container = ({ name, children, select }: ContainerProps) => {
     </ChakraProvider>
   );
 };
-
-export default Container;

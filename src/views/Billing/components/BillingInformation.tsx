@@ -1,15 +1,11 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Document } from "swr-firestore-v9";
+import { Document } from "../../../lib";
 
-import { Accordion, Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { Accordion, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 
 import { Withdrawals } from "../../../@types/interfaces";
-import Card from "../../../components/Card/Card";
-import CardBody from "../../../components/Card/CardBody";
-import CardHeader from "../../../components/Card/CardHeader";
-import Empty from "../../../components/Empty";
-import BillingRow from "../../../components/Tables/BillingRow";
+import { BillingRow, Card, CardBody, CardHeader, Empty } from "../../../components";
 
 interface BillingInformationProps {
   title: string;

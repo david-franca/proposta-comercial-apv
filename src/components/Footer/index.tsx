@@ -1,22 +1,8 @@
-import Image from "next/image";
-import React, { ReactNode } from "react";
-import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import React from "react";
 
-import {
-  Box,
-  chakra,
-  Container,
-  Flex,
-  Link,
-  List,
-  ListItem,
-  Stack,
-  Text,
-  useColorModeValue,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { Flex, Link, List, ListItem, Text } from "@chakra-ui/react";
 
-export default function Footer() {
+export const Footer = () => {
   return (
     <Flex
       flexDirection={{
@@ -63,7 +49,7 @@ export default function Footer() {
       </List>
     </Flex>
   );
-}
+};
 
 /* const SocialButton = ({
   children,

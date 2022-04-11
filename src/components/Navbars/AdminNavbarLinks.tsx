@@ -25,7 +25,7 @@ interface HeaderLinksProp {
   selected: string;
 }
 
-export default function HeaderLinks(props: HeaderLinksProp) {
+export const HeaderLinks = (props: HeaderLinksProp) => {
   const { fixed, secondary, onOpen, logoText, selected, ...rest } = props;
   const { colorMode, toggleColorMode } = useColorMode();
   const [routeActive, setRouteActive] = useState<Routes>();
@@ -110,6 +110,7 @@ export default function HeaderLinks(props: HeaderLinksProp) {
       <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="Truck Level" />
       <Icon
         as={IoSettings}
+        id="settings"
         cursor="pointer"
         ms={{ base: "16px", xl: "0px" }}
         me="16px"
@@ -166,4 +167,4 @@ export default function HeaderLinks(props: HeaderLinksProp) {
       </Menu> */}
     </Flex>
   );
-}
+};

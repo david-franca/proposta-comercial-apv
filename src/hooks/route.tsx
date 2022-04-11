@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { DefaultAuthProps } from "../@types/interfaces";
-import Loading from "../components/Loading/Loading";
+import { Loading } from "../components";
 import useAuth from "./useAuth";
 
 export const withPublic = (Component: ({}: DefaultAuthProps) => JSX.Element) => {
@@ -9,7 +9,6 @@ export const withPublic = (Component: ({}: DefaultAuthProps) => JSX.Element) => 
     const router = useRouter();
 
     if (auth && auth.user) {
-      console.log(auth.user);
       router.replace("/master/dashboard");
       return <Loading />;
     }

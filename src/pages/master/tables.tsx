@@ -1,5 +1,4 @@
-import Container from "../../components/Container/Container";
-import { Head } from "../../components/Head";
+import { Container } from "../../components";
 import { withProtected } from "../../hooks/route";
 import TablesView from "../../views/Tables";
 

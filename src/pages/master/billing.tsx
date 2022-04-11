@@ -1,4 +1,4 @@
-import Container from "../../components/Container/Container";
+import { Container } from "../../components";
 import { withProtected } from "../../hooks/route";
 import BillingView from "../../views/Billing";
 

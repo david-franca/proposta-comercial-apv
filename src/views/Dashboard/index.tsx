@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { IoShieldCheckmark, IoTimer, IoTrophy, IoWarning } from "react-icons/io5";
-import { Document, useCollection } from "swr-firestore-v9";
+import { Document, useCollection } from "../../lib";
 
 import { Flex, Grid, SimpleGrid } from "@chakra-ui/react";
 
 import { AppContextInterface, Proposal, Users } from "../../@types/interfaces";
-import { Users as FirebaseUsers } from "../../firebase";
 import ActiveUsers from "./components/ActiveUsers";
 import MiniStatistics from "./components/MiniStatistics";
 import PassRate from "./components/PassRate";
@@ -26,7 +25,7 @@ const Dashboard = ({ auth }: DashboardProps) => {
   const { data: proposal } = useCollection<Proposal>("Propostas", {
     orderBy: "createdAt",
     listen: true,
-    parseDates: ["ceratedAt"],
+    parseDates: ["createdAt"],
   });
   const { data: users } = useCollection<Users>("Users", {
     listen: true,
@@ -36,7 +35,7 @@ const Dashboard = ({ auth }: DashboardProps) => {
   const percentage = useCallback(
     (size: number) => {
       const percent = (size * 100) / proposalSize;
-      return `${percent.toFixed(2)}%`;
+      return Number.isNaN(percent) ? "0" : `${percent.toFixed(2)}%`;
     },
     [proposalSize]
   );
@@ -70,11 +69,6 @@ const Dashboard = ({ auth }: DashboardProps) => {
     ],
     [approved, expired, initiated, percentage, waiting]
   );
-
-  const randomDate = (start: Date) => {
-    const end = new Date();
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  };
 
   useEffect(() => {
     let aguarde = 0;
@@ -113,14 +107,8 @@ const Dashboard = ({ auth }: DashboardProps) => {
     if (users) {
       setUsersArray(users);
       setUsersSize(users.length);
-      users.forEach(async (user) => {
-        if (!user.createdAt) {
-          await FirebaseUsers().update(user.id, { createdAt: randomDate(new Date(2022, 2, 15)) });
-        }
-      });
     }
   }, [users]);
-
   return (
     <Flex flexDirection="column" pt={{ base: "120px", md: "75px" }}>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">

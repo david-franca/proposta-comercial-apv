@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Routes } from "../../@types/interfaces";
-import AdminNavbarLinks from "./AdminNavbarLinks";
+import { HeaderLinks } from "./AdminNavbarLinks";
 
 interface AdminNavbarProp {
   brandText: string;
@@ -27,7 +27,7 @@ interface AdminNavbarProp {
   selected: string;
 }
 
-export default function AdminNavbar(props: AdminNavbarProp) {
+export const AdminNavbar = (props: AdminNavbarProp) => {
   const [scrolled, setScrolled] = useState(false);
   const { fixed, secondary, brandText, onOpen, logoText, selected } = props;
   const [routeActive, setRouteActive] = useState<Routes>();
@@ -150,7 +150,7 @@ export default function AdminNavbar(props: AdminNavbarProp) {
           </NextLink>
         </Box>
         <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
-          <AdminNavbarLinks
+          <HeaderLinks
             onOpen={onOpen}
             logoText={logoText}
             secondary={secondary}
@@ -161,4 +161,4 @@ export default function AdminNavbar(props: AdminNavbarProp) {
       </Flex>
     </Flex>
   );
-}
+};

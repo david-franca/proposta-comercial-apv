@@ -5,7 +5,7 @@ interface HeadType {
   href?: string;
   rel?: string;
 }
-const Head: React.FC<HeadType> = ({ title, href, rel }) => {
+export const Head: React.FC<HeadType> = ({ title, href, rel }) => {
   return (
     <NextHead>
       <title>{title}</title>
@@ -14,5 +14,3 @@ const Head: React.FC<HeadType> = ({ title, href, rel }) => {
     </NextHead>
   );
 };
-
-export default Head;

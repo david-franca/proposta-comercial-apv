@@ -18,10 +18,6 @@ const MoneyInput = ({ value, isReadOnly, ...props }: MoneyInputProps) => {
     placeholder: "0.00",
   };
 
-  useEffect(() => {
-    console.log(currency(value, { precision: 10 }).value);
-  }, [value]);
-
   return (
     <Input
       as={NumberFormat}

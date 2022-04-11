@@ -1,11 +1,12 @@
-import Container from "../../../components/Container/Container";
+import { DefaultAuthProps } from "../../../@types/interfaces";
+import { Container } from "../../../components";
 import { withProtected } from "../../../hooks/route";
 import HandlingView from "../../../views/Handling";
 
-const Handling = () => {
+const Handling = ({ auth }: DefaultAuthProps) => {
   return (
     <Container name="Atendimento" select="handling">
-      <HandlingView />
+      <HandlingView auth={auth} />
     </Container>
   );
 };

@@ -1,13 +1,6 @@
 import { User } from "firebase/auth";
-import {
-  createContext,
-  Dispatch,
-  ProviderProps,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ProviderProps, useContext, useState } from "react";
+
 import { AppContextInterface } from "../@types/interfaces";
 import AuthService from "../service/auth.service";
 

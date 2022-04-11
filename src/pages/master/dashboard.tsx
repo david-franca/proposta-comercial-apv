@@ -1,5 +1,5 @@
 import { DefaultAuthProps } from "../../@types/interfaces";
-import Container from "../../components/Container/Container";
+import { Container } from "../../components";
 import { withProtected } from "../../hooks/route";
 import DashboardView from "../../views/Dashboard";
 

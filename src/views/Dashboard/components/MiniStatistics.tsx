@@ -11,9 +11,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 
-import Card from "../../../components/Card/Card";
-import CardBody from "../../../components/Card/CardBody";
-import IconBox from "../../../components/Icons/IconBox";
+import { Card, CardBody, IconBox } from "../../../components";
 
 interface MiniStatisticsProps {
   title: string;

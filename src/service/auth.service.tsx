@@ -37,4 +37,4 @@ class AuthService {
   }
 }
 
-export default new AuthService(getApp());
+export default new AuthService(getApp("next_app"));

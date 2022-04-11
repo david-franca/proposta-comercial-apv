@@ -2,7 +2,7 @@ import { IconType } from "react-icons";
 
 import { Flex, Icon, Progress, Text, useColorModeValue } from "@chakra-ui/react";
 
-import IconBox from "../../../components/Icons/IconBox";
+import { IconBox } from "../../../components";
 
 interface ChartStatisticsProps {
   title: string;

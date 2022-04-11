@@ -5,7 +5,7 @@ interface IconBoxProps extends FlexProps {
   children: ReactNode;
 }
 
-export default function IconBox(props: IconBoxProps) {
+export const IconBox = (props: IconBoxProps) => {
   const { children, ...rest } = props;
 
   return (
@@ -13,4 +13,4 @@ export default function IconBox(props: IconBoxProps) {
       {children}
     </Flex>
   );
-}
+};

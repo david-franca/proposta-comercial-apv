@@ -21,8 +21,8 @@ import {
 } from "@chakra-ui/react";
 
 import { Routes } from "../../@types/interfaces";
-import IconBox from "../Icons/IconBox";
-import { Separator } from "../Separator/Separator";
+import { IconBox } from "../Icons/IconBox";
+import { Separator } from "../Separator";
 
 interface SidebarProps {
   routes: Array<Routes>;
@@ -50,7 +50,7 @@ export const SidebarResponsive = ({ selected, routes, logoText }: SidebarProps) 
       if (route.component === selected) {
         // selected(route);
         return (
-          <NextLink href={`/master/${route.component}`} key={index}>
+          <NextLink passHref href={`/master/${route.component}`} key={index}>
             <Button
               onClick={() => swithPage(route.component)}
               boxSize="initial"
@@ -92,7 +92,7 @@ export const SidebarResponsive = ({ selected, routes, logoText }: SidebarProps) 
         );
       }
       return (
-        <NextLink href={`/master/${route.component}`} key={index}>
+        <NextLink passHref href={`/master/${route.component}`} key={index}>
           <Button
             onClick={() => swithPage(route.component)}
             boxSize="initial"

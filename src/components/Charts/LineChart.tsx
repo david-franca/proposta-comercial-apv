@@ -1,9 +1,9 @@
 import moment from "moment";
 import dynamic from "next/dynamic";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Document } from "swr-firestore-v9";
 
 import { Users } from "../../@types/interfaces";
+import { Document } from "../../lib";
 import { lineChartData, lineChartOptions } from "../../utils/charts";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -12,7 +12,7 @@ interface LineChartProps {
   users: Document<Users>[];
 }
 
-const LineChart = ({ users }: LineChartProps) => {
+export const LineChart = ({ users }: LineChartProps) => {
   const lineOptions = useMemo(() => lineChartOptions, []);
   const [chartOptions, setChartOptions] = useState<ApexCharts.ApexOptions>(lineOptions);
   const [chartData, setChartData] = useState<ApexAxisChartSeries>(lineChartData);
@@ -159,5 +159,3 @@ const LineChart = ({ users }: LineChartProps) => {
     />
   );
 };
-
-export default LineChart;

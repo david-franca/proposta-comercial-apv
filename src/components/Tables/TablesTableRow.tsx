@@ -1,33 +1,19 @@
-import { Timestamp } from "firebase/firestore";
+import axios from "axios";
 import moment from "moment";
 import NextLink from "next/link";
 import React, { useEffect, useState } from "react";
 
-import {
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Avatar,
-  Badge,
-  Button,
-  Flex,
-  Td,
-  Text,
-  Tr,
-  useColorMode,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Avatar, Button, Flex, Td, Text, Tr, useColorModeValue } from "@chakra-ui/react";
+
 import { Proposal } from "../../@types/interfaces";
-import { Document } from "swr-firestore-v9";
-import axios, { AxiosError } from "axios";
+import { Document } from "../../lib";
 
 interface TablesRowProps {
   row: Document<Proposal>;
   onClick: (id: string) => void;
 }
 
-function TablesTableRow({ row, onClick }: TablesRowProps) {
+export const TablesTableRow = ({ row, onClick }: TablesRowProps) => {
   const { fullName, cellPhone, photoURL, createdAt, expiresIn, id } = row;
   const textColor = useColorModeValue("gray.700", "white");
   const [sourceImage, setSourceImage] = useState("");
@@ -91,7 +77,7 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
         </Text>
       </Td>
       <Td>
-        <NextLink href={`handling/${id}`}>
+        <NextLink passHref href={`handling/${id}`}>
           <Button p="0px" bg="transparent" variant="no-hover">
             <Text fontSize="md" color="gray.400" fontWeight="bold" cursor="pointer">
               Editar
@@ -101,6 +87,4 @@ function TablesTableRow({ row, onClick }: TablesRowProps) {
       </Td>
     </Tr>
   );
-}
-
-export default TablesTableRow;
+};

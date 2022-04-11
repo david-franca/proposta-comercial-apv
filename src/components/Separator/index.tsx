@@ -7,7 +7,7 @@ interface SeparatorProps {
   rest?: FlexProps;
 }
 
-export function Separator(props: SeparatorProps) {
+export const Separator = (props: SeparatorProps) => {
   const { variant, children, ...rest } = props;
   return (
     <Flex
@@ -19,4 +19,4 @@ export function Separator(props: SeparatorProps) {
       {children}
     </Flex>
   );
-}
+};

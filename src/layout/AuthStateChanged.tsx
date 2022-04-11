@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Loading from "../components/Loading/Loading";
+import { Loading } from "../components";
 
 import useAuth from "../hooks/useAuth";
 import AuthService from "../service/auth.service";
