@@ -27,7 +27,7 @@ export const Footer = () => {
       >
         &copy; {new Date().getFullYear()},{" "}
         <Link color="teal.400" href="https://www.apvtruck.com.br" target="_blank">
-          {"Truck Level "}
+          {"MAX Caminhões "}
         </Link>
       </Text>
       <List display="flex">

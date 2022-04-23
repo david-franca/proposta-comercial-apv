@@ -34,7 +34,7 @@ export const Container = ({ name, children, select }: ContainerProps) => {
         <Portal>
           <AdminNavbar
             onOpen={onOpen}
-            logoText={"Truck Level"}
+            logoText={""}
             brandText={name}
             secondary={false}
             fixed={true}

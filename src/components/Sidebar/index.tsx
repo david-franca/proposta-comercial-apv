@@ -55,7 +55,7 @@ export const Sidebar = ({ routes, selected }: SidebarProps) => {
             routes={routes}
             selected={selected}
             variantChange={variantChange}
-            logoText="Truck Level"
+            logoText=""
           />
         </Box>
       </Box>

@@ -107,7 +107,7 @@ export const HeaderLinks = (props: HeaderLinksProp) => {
           <Text display={{ sm: "none", md: "flex" }}>Sign In</Text>
         </Button>
       </Link> */}
-      <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="Truck Level" />
+      <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="" />
       <Icon
         as={IoSettings}
         id="settings"

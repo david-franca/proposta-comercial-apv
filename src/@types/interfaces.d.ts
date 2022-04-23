@@ -60,12 +60,12 @@ export interface DefaultAuthProps {
 export interface Proposal {
   fullName: string;
   cellPhone: string;
+  code?: string;
   status?: Status;
   photoURL?: string;
-  code?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  accession?: number;
+  accession?: boolean;
   admin?: number;
   bodywork?: number;
   brand?: string;
@@ -74,14 +74,36 @@ export interface Proposal {
   email?: string;
   expiresIn?: Date;
   fipe?: number;
-  inspection?: number;
-  installation?: number;
+  inspection?: boolean;
+  installation?: boolean;
   licensePlate?: string;
   model?: string;
   protected?: number;
   theft?: number;
   total?: number;
   year?: string;
+}
+
+export interface Vehicles {
+  status: Status;
+  createdAt: Date;
+  updatedAt: Date;
+  accession: boolean;
+  admin: number;
+  bodywork: number;
+  brand: string;
+  cotas: number;
+  discount: number;
+  expiresIn: Date;
+  fipe: number;
+  inspection: boolean;
+  installation: boolean;
+  licensePlate: string;
+  model: string;
+  protected: number;
+  theft: number;
+  total: number;
+  year: string;
 }
 
 export interface FormValues {
@@ -99,9 +121,9 @@ export interface FormValues {
   admin: number;
   theft: number;
   total: number;
-  accession: number;
-  inspection: number;
-  installation: number;
+  accession: boolean;
+  inspection: boolean;
+  installation: boolean;
   cotas: number;
   mensal: number;
 }

@@ -1,7 +1,7 @@
 import "firebase/auth";
 import "firebase/firestore";
 
-import { FirebaseOptions, initializeApp } from "firebase/app";
+import { FirebaseOptions } from "firebase/app";
 
 import { Fuego } from "../lib";
 
@@ -12,6 +12,7 @@ const clientCredentials: FirebaseOptions = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 const fuego = new Fuego(clientCredentials, "next_app");
 

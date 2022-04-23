@@ -187,7 +187,7 @@ const Login = ({ auth }: DefaultAuthProps) => {
               right="0px"
             >
               <Box
-                bgImage="/images/bg6.jpg"
+                bgImage="/images/bg1.jpg"
                 w="100%"
                 h="100%"
                 bgSize="cover"
@@ -199,7 +199,7 @@ const Login = ({ auth }: DefaultAuthProps) => {
                 alignItems="center"
               >
                 <Box margin="70px">
-                  <Image src="/images/full-logo.png" alt="logo" />
+                  <Image src="/images/logo-name.png" alt="logo" />
                 </Box>
               </Box>
             </Box>

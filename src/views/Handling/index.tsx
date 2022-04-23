@@ -5,11 +5,12 @@ import moment from "moment";
 import NP from "number-precision";
 import { useEffect, useMemo, useState } from "react";
 import { IoLogoWhatsapp } from "react-icons/io5";
-import { useCollection, useDocument } from "../../lib";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   chakra,
   Checkbox,
@@ -17,12 +18,14 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Icon,
   Radio,
   RadioGroup,
   Select,
   SimpleGrid,
   Stack,
   Text,
+  Tooltip,
   useColorModeValue,
   useToast,
   UseToastOptions,
@@ -37,6 +40,7 @@ import {
   Status,
 } from "../../@types/interfaces";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useCollection, useDocument } from "../../lib";
 import { capitalizeWords, createLink, currencyToNumber, fipeAPI } from "../../utils";
 import { InputForm } from "./components/Input";
 import { MaskedInputField } from "./components/MaskedInputField";
@@ -61,9 +65,9 @@ const initialValues: FormValues = {
   admin: 0,
   theft: 200,
   total: 0,
-  accession: 600,
-  inspection: 50,
-  installation: 170,
+  accession: true,
+  inspection: true,
+  installation: true,
   cotas: 0,
   mensal: 0,
 };
@@ -119,7 +123,7 @@ const Handling = ({ id, auth }: HandlingProps) => {
       values.total = currency(values.total).value;
       values.mensal = currency(values.mensal).value;
       console.log(values);
-      // await addProposal(values);
+      await addProposal(values);
     },
   });
 
@@ -171,9 +175,9 @@ const Handling = ({ id, auth }: HandlingProps) => {
       admin: currency(proposal.admin).value,
       theft: currency(proposal.theft).value,
       total: currency(proposal.total).value,
-      accession: currency(proposal.accession).value,
-      inspection: currency(proposal.inspection).value,
-      installation: currency(proposal.installation).value,
+      accession: proposal.accession,
+      inspection: proposal.inspection,
+      installation: proposal.installation,
       discount: Number(proposal.discount),
       cotas: proposal.cotas,
     };
@@ -215,18 +219,12 @@ const Handling = ({ id, auth }: HandlingProps) => {
     () =>
       NP.plus(
         formik.values.admin,
-        Number(formik.values.accession),
-        Number(formik.values.inspection),
-        Number(formik.values.installation),
+        Number(accession ? 600 : 0),
+        Number(inspection ? 50 : 0),
+        Number(installation ? 170 : 0),
         Number(formik.values.theft)
       ),
-    [
-      formik.values.accession,
-      formik.values.admin,
-      formik.values.inspection,
-      formik.values.installation,
-      formik.values.theft,
-    ]
+    [accession, formik.values.admin, inspection, installation, formik.values.theft]
   );
 
   const cotaValueUnity = 21.16;
@@ -411,33 +409,6 @@ const Handling = ({ id, auth }: HandlingProps) => {
   }, [formik.values.discount]);
 
   useEffect(() => {
-    if (accession) {
-      formik.setFieldValue("accession", 600);
-    } else {
-      formik.setFieldValue("accession", 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accession]);
-
-  useEffect(() => {
-    if (inspection) {
-      formik.setFieldValue("inspection", 50);
-    } else {
-      formik.setFieldValue("inspection", 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inspection]);
-
-  useEffect(() => {
-    if (installation) {
-      formik.setFieldValue("installation", 170);
-    } else {
-      formik.setFieldValue("installation", 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [installation]);
-
-  useEffect(() => {
     formik.setFieldValue("total", total);
     formik.setFieldValue("mensal", mensal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -485,9 +456,9 @@ const Handling = ({ id, auth }: HandlingProps) => {
         formik.setFieldValue("admin", proposal.admin ?? 0);
         formik.setFieldValue("theft", proposal.theft ?? 0);
         formik.setFieldValue("total", proposal.total ?? 0);
-        formik.setFieldValue("accession", proposal.accession ?? 0);
-        formik.setFieldValue("inspection", proposal.inspection ?? 0);
-        formik.setFieldValue("installation", proposal.installation ?? 0);
+        formik.setFieldValue("accession", proposal.accession);
+        formik.setFieldValue("inspection", proposal.inspection);
+        formik.setFieldValue("installation", proposal.installation);
         formik.setFieldValue("cotas", proposal.cotas ?? 0);
         setUserCode(proposal.code ?? "");
         setLoading(false);
@@ -724,43 +695,67 @@ const Handling = ({ id, auth }: HandlingProps) => {
           <FormLabel ms="4px" fontSize="sm" fontWeight="normal">
             Taxas
           </FormLabel>
-          <Checkbox
-            id="accession"
-            colorScheme="teal"
-            fontSize="sm"
-            ms="4px"
-            mb="12px"
-            size="lg"
-            value={formik.values.accession}
-            isChecked={accession}
-            onChange={(e) => setAccession(e.target.checked)}
-          >
-            Adesão
-          </Checkbox>
-          <Checkbox
-            colorScheme="teal"
-            fontSize="sm"
-            ms="4px"
-            mb="12px"
-            size="lg"
-            value={formik.values.inspection}
-            isChecked={inspection}
-            onChange={(e) => setInspection(e.target.checked)}
-          >
-            Vistoria
-          </Checkbox>
-          <Checkbox
-            colorScheme="teal"
-            fontSize="sm"
-            ms="4px"
-            mb="12px"
-            size="lg"
-            value={formik.values.installation}
-            isChecked={installation}
-            onChange={(e) => setInstallation(e.target.checked)}
-          >
-            Instalação
-          </Checkbox>
+          <Box>
+            <Checkbox
+              id="accession"
+              colorScheme="teal"
+              fontSize="sm"
+              ms="4px"
+              mb="12px"
+              size="lg"
+              // value={formik.values.accession}
+              isChecked={accession}
+              onChange={(e) => {
+                setAccession(e.target.checked);
+                formik.setFieldValue("accession", e.target.checked);
+              }}
+            >
+              Adesão
+            </Checkbox>
+            <Tooltip label="R$ 600,00" hasArrow fontSize="md" placement="right">
+              <InfoOutlineIcon marginLeft="5px" fontSize="sm" />
+            </Tooltip>
+          </Box>
+          <Box>
+            <Checkbox
+              colorScheme="teal"
+              fontSize="sm"
+              ms="4px"
+              mb="12px"
+              size="lg"
+              // value={formik.values.inspection}
+              isChecked={inspection}
+              onChange={(e) => {
+                setInspection(e.target.checked);
+                formik.setFieldValue("inspection", e.target.checked);
+              }}
+            >
+              Vistoria
+            </Checkbox>
+            <Tooltip label="R$ 50,00" hasArrow fontSize="md" placement="right">
+              <InfoOutlineIcon marginLeft="5px" fontSize="sm" />
+            </Tooltip>
+          </Box>
+          <Box>
+            <Checkbox
+              colorScheme="teal"
+              fontSize="sm"
+              ms="4px"
+              mb="12px"
+              size="lg"
+              // value={formik.values.installation}
+              isChecked={installation}
+              onChange={(e) => {
+                setInstallation(e.target.checked);
+                formik.setFieldValue("installation", e.target.checked);
+              }}
+            >
+              Instalação
+            </Checkbox>
+            <Tooltip label="R$ 170,00" hasArrow fontSize="md" placement="right">
+              <InfoOutlineIcon marginLeft="5px" fontSize="sm" />
+            </Tooltip>
+          </Box>
           <RadioGroup
             id="theft"
             value={radioValue}
@@ -837,7 +832,7 @@ const Handling = ({ id, auth }: HandlingProps) => {
             bg: "teal.400",
           }}
         >
-          ENVIAR
+          SALVAR E ENVIAR
         </Button>
       </form>
     </Flex>

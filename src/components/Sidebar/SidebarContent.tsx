@@ -157,7 +157,7 @@ export const SidebarContent = ({
           fontSize="11px"
           flexDir="column"
         >
-          <Image alt="Logo" src="/images/logo.png" h="70px" w="70px" />
+          <Image alt="Logo" src="/images/logo-name.png" h="70px" />
           <Text fontSize="sm" mt="3px" paddingTop={"15px"}>
             {logoText}
           </Text>
