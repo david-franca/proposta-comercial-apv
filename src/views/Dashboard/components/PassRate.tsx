@@ -3,7 +3,6 @@ import { Document } from "../../../lib";
 
 import { Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 
-import { Users } from "../../../@types/interfaces";
 import { Card, CardHeader, LineChart } from "../../../components";
 import { userByWeek } from "../../../utils/random";
 
@@ -11,7 +10,7 @@ interface PassRateProps {
   title: string;
   percentage: number;
   isLoaded: boolean;
-  users: Document<Users>[];
+  users: Document[];
 }
 const PassRate = ({ title, isLoaded, users }: PassRateProps) => {
   const textColor = useColorModeValue("gray.700", "white");

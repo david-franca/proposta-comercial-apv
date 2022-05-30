@@ -1,14 +1,12 @@
 import moment from "moment";
 import { Document } from "../lib";
 
-import { Users } from "../@types/interfaces";
-
 export const randomDate = (start: Date) => {
   const end = new Date();
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
-export const userByWeek = (users: Document<Users>[]) => {
+export const userByWeek = (users: Document[]) => {
   const thisWeek = {
     start: moment().startOf("week"),
     end: moment().endOf("week"),

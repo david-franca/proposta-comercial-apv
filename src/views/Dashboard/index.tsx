@@ -4,7 +4,7 @@ import { Document, useCollection } from "../../lib";
 
 import { Flex, Grid, SimpleGrid } from "@chakra-ui/react";
 
-import { AppContextInterface, Proposal, Users } from "../../@types/interfaces";
+import { AppContextInterface } from "../../@types/interfaces";
 import ActiveUsers from "./components/ActiveUsers";
 import MiniStatistics from "./components/MiniStatistics";
 import PassRate from "./components/PassRate";
@@ -20,14 +20,14 @@ const Dashboard = ({ auth }: DashboardProps) => {
   const [expired, setExpired] = useState(0);
   const [usersSize, setUsersSize] = useState(0);
   const [proposalSize, setProposalSize] = useState(0);
-  const [usersArray, setUsersArray] = useState<Document<Users>[]>([]);
+  const [usersArray, setUsersArray] = useState<Document[]>([]);
 
-  const { data: proposal } = useCollection<Proposal>("Propostas", {
+  const { data: proposal } = useCollection("Propostas", {
     orderBy: "createdAt",
     listen: true,
     parseDates: ["createdAt"],
   });
-  const { data: users } = useCollection<Users>("Users", {
+  const { data: users } = useCollection("Users", {
     listen: true,
     parseDates: ["createdAt"],
   });

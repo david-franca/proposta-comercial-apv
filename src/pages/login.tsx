@@ -43,6 +43,7 @@ const Login = ({ auth }: DefaultAuthProps) => {
   const [loading, setLoading] = useState(false);
   const { signInWithEmailAndPassword } = auth;
   const [toastMessage, setToastMessage] = useState<UseToastOptions>();
+  const logoName = useColorModeValue("/images/full-logo1.png", "/images/logo-name.png");
 
   const formSchema = Yup.object().shape({
     email: Yup.string().email().required(),
@@ -199,7 +200,7 @@ const Login = ({ auth }: DefaultAuthProps) => {
                 alignItems="center"
               >
                 <Box margin="70px">
-                  <Image src="/images/logo-name.png" alt="logo" />
+                  <Image src={logoName} alt="logo" />
                 </Box>
               </Box>
             </Box>

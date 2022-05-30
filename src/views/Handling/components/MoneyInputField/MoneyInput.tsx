@@ -25,6 +25,7 @@ const MoneyInput = ({ value, isReadOnly, ...props }: MoneyInputProps) => {
       {...formatProps}
       fontSize="sm"
       isReadOnly={isReadOnly}
+      variant="filled"
       ms="4px"
       size="lg"
       borderRightRadius="15px"

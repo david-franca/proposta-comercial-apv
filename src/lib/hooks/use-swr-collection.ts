@@ -434,7 +434,10 @@ export const useCollection = <Data extends DocumentData, Doc extends Document = 
    * - It also updates the local cache using SWR's `mutate`. This will prove highly convenient over the regular `add` function provided by Firestore.
    */
   const add = useCallback(
-    <T extends Data | Data[]>(data: T): Promise<T extends Data ? string : string[]> | null => {
+    <T extends Data | Data[]>(
+      data: T,
+      newPath?: string
+    ): Promise<T extends Data ? string : string[]> | null => {
       if (!path) return null;
 
       const multiple = Array.isArray(data);
@@ -463,7 +466,7 @@ export const useCollection = <Data extends DocumentData, Doc extends Document = 
 
       docsToAdd.forEach(({ id, ...doc }) => {
         // take the ID out of the document
-        batch.set(_doc(ref, id), doc);
+        batch.set(_doc(ref, newPath ?? id), doc);
       });
 
       return batch.commit().then(() => {

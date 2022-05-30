@@ -21,7 +21,7 @@ export const SidebarContent = ({
   logoText,
 }: SidebarContendProps) => {
   const router = useRouter();
-
+  const logoName = useColorModeValue("/images/full-logo1.png", "/images/logo-name.png");
   const swithPage = (page: string) => {
     router.push(`${page}`);
   };
@@ -157,7 +157,7 @@ export const SidebarContent = ({
           fontSize="11px"
           flexDir="column"
         >
-          <Image alt="Logo" src="/images/logo-name.png" h="70px" />
+          <Image alt="Logo" src={logoName} h="70px" />
           <Text fontSize="sm" mt="3px" paddingTop={"15px"}>
             {logoText}
           </Text>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Loading } from "../components";
 
 import useAuth from "../hooks/useAuth";

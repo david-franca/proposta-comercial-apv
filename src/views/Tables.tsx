@@ -16,14 +16,13 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 
-import { Proposal } from "../@types/interfaces";
 import { Card, CardBody, TablesTableRow } from "../components";
 
 const Tables = () => {
-  const [tablesData, setTablesData] = useState<Document<Proposal>[]>([]);
+  const [tablesData, setTablesData] = useState<Document[]>([]);
   const [idRow, setIdRow] = useState("");
   const textColor = useColorModeValue("gray.700", "white");
-  const { data } = useCollection<Proposal>("Propostas", {
+  const { data } = useCollection("Propostas", {
     where: ["code", "!=", ""],
     listen: true,
     parseDates: ["createdAt", "updatedAt", "expiresIn"],

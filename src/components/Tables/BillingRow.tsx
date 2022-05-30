@@ -14,7 +14,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 
-import { StatusPayment, Withdrawals } from "../../@types/interfaces";
+import { StatusPayment } from "../../@types/interfaces";
 import useAuth from "../../hooks/useAuth";
 import { Document, useCollection, useDocument } from "../../lib";
 import { currencyBRL } from "../../utils";
@@ -31,11 +31,9 @@ interface BillingRowProps {
 export const BillingRow = ({ name, createdAt, email, value, status, uid }: BillingRowProps) => {
   const bgColor = useColorModeValue("#F8F9FA", "gray.800");
   const nameColor = useColorModeValue("gray.500", "white");
-  const { update, data } = useDocument<Withdrawals>(`/Withdrawals/${uid}`);
+  const { update, data } = useDocument(`/Withdrawals/${uid}`);
   const { add } = useCollection("/Transactions");
-  const [withdrawals, setWithdrawals] = useState<Document<Withdrawals>>(
-    {} as Document<Withdrawals>
-  );
+  const [withdrawals, setWithdrawals] = useState<Document>({} as Document);
   const auth = useAuth();
 
   useEffect(() => {

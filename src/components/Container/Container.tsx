@@ -23,7 +23,7 @@ export const Container = ({ name, children, select }: ContainerProps) => {
 
   return (
     <ChakraProvider theme={theme} resetCSS={false}>
-      <Head title={name} />
+      <Head title={`${name} | MAX Caminhões`} />
       <Sidebar routes={route} selected={select} />
       <MainPanel
         w={{

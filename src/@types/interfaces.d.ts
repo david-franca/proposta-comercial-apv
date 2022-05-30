@@ -57,55 +57,6 @@ export interface DefaultAuthProps {
   auth: AppContextInterface;
 }
 
-export interface Proposal {
-  fullName: string;
-  cellPhone: string;
-  code?: string;
-  status?: Status;
-  photoURL?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  accession?: boolean;
-  admin?: number;
-  bodywork?: number;
-  brand?: string;
-  cotas?: number;
-  discount?: number;
-  email?: string;
-  expiresIn?: Date;
-  fipe?: number;
-  inspection?: boolean;
-  installation?: boolean;
-  licensePlate?: string;
-  model?: string;
-  protected?: number;
-  theft?: number;
-  total?: number;
-  year?: string;
-}
-
-export interface Vehicles {
-  status: Status;
-  createdAt: Date;
-  updatedAt: Date;
-  accession: boolean;
-  admin: number;
-  bodywork: number;
-  brand: string;
-  cotas: number;
-  discount: number;
-  expiresIn: Date;
-  fipe: number;
-  inspection: boolean;
-  installation: boolean;
-  licensePlate: string;
-  model: string;
-  protected: number;
-  theft: number;
-  total: number;
-  year: string;
-}
-
 export interface FormValues {
   fullName: string;
   cellPhone: string;
@@ -125,8 +76,12 @@ export interface FormValues {
   inspection: boolean;
   installation: boolean;
   cotas: number;
-  mensal: number;
+  monthlyPayment: number;
 }
+
+type AssociateValues = Pick<FormValues, "fullName" | "cellPhone" | "email" | "licensePlate">;
+
+type VehicleValues = Pick<FormValues, "brand" | "model" | "year" | "fipe" | "bodywork">;
 
 export type StatusPayment =
   | "Pending"
@@ -137,30 +92,3 @@ export type StatusPayment =
   | "Revoked"
   | "Preapproved"
   | "Cancelled";
-
-export interface Withdrawals {
-  createdAt: Date;
-  uid: string;
-  name: string;
-  pix: string;
-  request: string;
-  status: StatusPayment;
-}
-
-export interface Users {
-  code: string;
-  displayName: string;
-  email: string;
-  phoneNumber: string;
-  photoURL: string;
-  wallet: number;
-  createdAt?: Date;
-}
-
-export interface Transaction {
-  amount: string;
-  approvedBy: string;
-  createdAt: Date;
-  to: string;
-  type: string;
-}

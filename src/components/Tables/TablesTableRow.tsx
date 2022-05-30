@@ -5,11 +5,10 @@ import React, { useEffect, useState } from "react";
 
 import { Avatar, Button, Flex, Td, Text, Tr, useColorModeValue } from "@chakra-ui/react";
 
-import { Proposal } from "../../@types/interfaces";
 import { Document } from "../../lib";
 
 interface TablesRowProps {
-  row: Document<Proposal>;
+  row: Document;
   onClick: (id: string) => void;
 }
 

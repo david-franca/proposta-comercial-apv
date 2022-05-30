@@ -2,14 +2,13 @@ import moment from "moment";
 import dynamic from "next/dynamic";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Users } from "../../@types/interfaces";
 import { Document } from "../../lib";
 import { lineChartData, lineChartOptions } from "../../utils/charts";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface LineChartProps {
-  users: Document<Users>[];
+  users: Document[];
 }
 
 export const LineChart = ({ users }: LineChartProps) => {
@@ -17,7 +16,7 @@ export const LineChart = ({ users }: LineChartProps) => {
   const [chartOptions, setChartOptions] = useState<ApexCharts.ApexOptions>(lineOptions);
   const [chartData, setChartData] = useState<ApexAxisChartSeries>(lineChartData);
 
-  const createLineData = useCallback((usersArray: Document<Users>[]): ApexAxisChartSeries => {
+  const createLineData = useCallback((usersArray: Document[]): ApexAxisChartSeries => {
     const series: ApexAxisChartSeries = [
       {
         name: "Essa Semana",
@@ -122,7 +121,7 @@ export const LineChart = ({ users }: LineChartProps) => {
     return series;
   }, []);
 
-  const verify = (user: Users) => {
+  const verify = (user: any) => {
     const thisWeek = {
       start: moment().startOf("week"),
       end: moment().endOf("week"),

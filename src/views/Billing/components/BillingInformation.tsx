@@ -4,21 +4,20 @@ import { Document } from "../../../lib";
 
 import { Accordion, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 
-import { Withdrawals } from "../../../@types/interfaces";
 import { BillingRow, Card, CardBody, CardHeader, Empty } from "../../../components";
 
 interface BillingInformationProps {
   title: string;
-  data: Document<Withdrawals>[];
+  data: Document[];
 }
 
 const BillingInformation = ({ title, data }: BillingInformationProps) => {
   const textColor = useColorModeValue("gray.700", "white");
   const [empty, setEmpty] = useState(true);
-  const [row, setRow] = useState<Document<Withdrawals>[]>([]);
+  const [row, setRow] = useState<Document[]>([]);
 
   useEffect(() => {
-    const array: Document<Withdrawals>[] = [];
+    const array: Document[] = [];
     data.forEach((doc) => {
       if (doc.status === "Pending") {
         array.push(doc);

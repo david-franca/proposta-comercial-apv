@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowDown, FaArrowUp, FaRegCalendarAlt } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
-import { Document, useCollection } from "../../../lib";
 
 // Chakra imports
 import { Center, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react";
 
-import { Transaction, Withdrawals } from "../../../@types/interfaces";
 // Custom components
 import { Card, CardBody, CardHeader, Empty, TransactionRow } from "../../../components";
+import { Document, useCollection } from "../../../lib";
 
 interface TransactionsProps {
   title: string;
   date: string;
-  transactions: Document<Withdrawals>[];
+  transactions: Document[];
 }
 
 const Transactions = ({ title, date }: TransactionsProps) => {
   // Chakra color mode
   const textColor = useColorModeValue("gray.700", "white");
-  const [transactions, setTransactions] = useState<Document<Transaction>[]>([]);
+  const [transactions, setTransactions] = useState<Document[]>([]);
 
-  const { data } = useCollection<Transaction>("/Transactions", {
+  const { data } = useCollection("/Transactions", {
     listen: true,
     parseDates: ["createdAt"],
   });

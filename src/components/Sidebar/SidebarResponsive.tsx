@@ -139,6 +139,7 @@ export const SidebarResponsive = ({ selected, routes, logoText }: SidebarProps) 
 
   const mainText = useColorModeValue("gray.700", "gray.200");
   let hamburgerColor = useColorModeValue("gray.500", "gray.200");
+  const logoName = useColorModeValue("/images/full-logo1.png", "/images/logo-name.png");
 
   const brand = (
     <Box pt="35px" mb="8px">
@@ -154,7 +155,7 @@ export const SidebarResponsive = ({ selected, routes, logoText }: SidebarProps) 
         fontSize="11px"
         flexDir="column"
       >
-        <Image alt="Logo" src="/images/logo-name.png" h="70px" me="10px" />
+        <Image alt="Logo" src={logoName} h="70px" me="10px" />
         <Text fontSize="sm" mt="3px" paddingTop={"15px"}>
           {logoText}
         </Text>

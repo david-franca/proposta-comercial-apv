@@ -33,11 +33,7 @@ interface InputFormProps {
   min?: number;
   max?: number;
   currency?: boolean;
-  setFieldValue?: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined
-  ) => Promise<void> | Promise<FormikErrors<FormValues>>;
+  setFieldValue?: (field: string, value: any, shouldValidate?: boolean | undefined) => void;
 }
 
 const InputForm = (props: InputFormProps) => {

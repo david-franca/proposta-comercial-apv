@@ -3,18 +3,17 @@ import { Document, useCollection } from "../../lib";
 
 import { Flex, Grid } from "@chakra-ui/react";
 
-import { Withdrawals } from "../../@types/interfaces";
 import BillingInformation from "./components/BillingInformation";
 import Transactions from "./components/Transactions";
 
 const Billing = () => {
-  const { data: withdrawals } = useCollection<Withdrawals>("Withdrawals", {
+  const { data: withdrawals } = useCollection("Withdrawals", {
     parseDates: ["createdAt"],
     listen: true,
     orderBy: ["createdAt", "asc"],
   });
 
-  const [billingData, setBillingData] = useState<Document<Withdrawals>[]>([]);
+  const [billingData, setBillingData] = useState<Document[]>([]);
 
   useEffect(() => {
     if (withdrawals) {
