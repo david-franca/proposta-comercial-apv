@@ -34,6 +34,7 @@ Yup.setLocale(ptForm);
 interface VehicleProps {
   handleIndex: (index: number) => void;
   handleVehicle: (vehicle: VehicleValues) => void;
+  handleFipe: (fipe: FIPE) => void;
 }
 
 const initialValues: VehicleValues = {
@@ -44,12 +45,11 @@ const initialValues: VehicleValues = {
   bodywork: 0,
 };
 
-export const Vehicle = ({ handleIndex, handleVehicle }: VehicleProps) => {
+export const Vehicle = ({ handleIndex, handleVehicle, handleFipe }: VehicleProps) => {
   const [fetchedBrands, setFetchedBrands] = useState<FipeApi[]>([]);
   const [fetchedModels, setFetchedModels] = useState<FipeApi[]>([]);
   const [fetchedYears, setFetchedYears] = useState<FipeApi[]>([]);
   const [toastMessage, setToastMessage] = useState<UseToastOptions>();
-  const [_fipeData, setFipeData] = useLocalStorage<FIPE>("fipe", {} as FIPE);
   const toast = useToast();
 
   const formSchema = Yup.object().shape({
@@ -66,7 +66,6 @@ export const Vehicle = ({ handleIndex, handleVehicle }: VehicleProps) => {
     onSubmit: async (values) => {
       values.bodywork = currency(values.bodywork).value;
       values.fipe = currency(values.fipe).value;
-      console.log(values);
       handleVehicle(values);
       handleIndex(2);
     },
@@ -143,7 +142,7 @@ export const Vehicle = ({ handleIndex, handleVehicle }: VehicleProps) => {
         .get<FIPE>(`trucks/brands/${brand}/models/${model}/years/${year}`)
         .then(({ data }) => {
           setFieldValue("fipe", currencyToNumber(data.price));
-          setFipeData(data);
+          handleFipe(data);
         })
         .catch((e: AxiosError) => {
           setToastMessage({

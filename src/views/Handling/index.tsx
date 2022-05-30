@@ -4,7 +4,7 @@ import { ptForm } from "yup-locale-pt";
 
 import { Accordion, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 
-import { AssociateValues, DefaultAuthProps, VehicleValues } from "../../@types/interfaces";
+import { AssociateValues, DefaultAuthProps, FIPE, VehicleValues } from "../../@types/interfaces";
 import { useCollection, useDocument } from "../../lib";
 import { CustomersModel, VehiclesModels } from "../../models";
 import { Associate } from "./components/Associate";
@@ -42,6 +42,7 @@ const Handling = ({ id, auth }: HandlingProps) => {
   const [index, setIndex] = useState<number | undefined>(0);
   const [person, setPerson] = useState({} as AssociateValues);
   const [vehicle, setVehicle] = useState({} as VehicleValues);
+  const [fipe, setFipe] = useState({} as FIPE);
 
   const handleIndexAccordionItem = (indexItem: number) => {
     setIndex(indexItem);
@@ -55,6 +56,10 @@ const Handling = ({ id, auth }: HandlingProps) => {
     setVehicle(vehicle);
   };
 
+  const handleFipe = (fipe: FIPE) => {
+    setFipe(fipe);
+  };
+
   return (
     <Flex flexDirection="column" pt={{ base: "120px", md: "75px" }}>
       <Text fontSize="xl" color={textColor} fontWeight="bold" textAlign="center" mb="22px">
@@ -64,9 +69,18 @@ const Handling = ({ id, auth }: HandlingProps) => {
       <Accordion paddingBottom={8} index={index}>
         <Associate handleIndex={handleIndexAccordionItem} handlePerson={handlePerson} />
 
-        <Vehicle handleIndex={handleIndexAccordionItem} handleVehicle={handleVehicle} />
+        <Vehicle
+          handleIndex={handleIndexAccordionItem}
+          handleVehicle={handleVehicle}
+          handleFipe={handleFipe}
+        />
 
-        <Summary handleIndex={handleIndexAccordionItem} vehicle={vehicle} person={person} />
+        <Summary
+          handleIndex={handleIndexAccordionItem}
+          vehicle={vehicle}
+          person={person}
+          fipe={fipe}
+        />
       </Accordion>
     </Flex>
   );
