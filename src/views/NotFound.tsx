@@ -8,7 +8,7 @@ export default function NotFound() {
   const router = useRouter();
 
   const redirect = () => {
-    router.replace("/login");
+    router.replace("/");
   };
 
   return (

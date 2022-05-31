@@ -9,7 +9,7 @@ export const withPublic = (Component: ({}: DefaultAuthProps) => JSX.Element) => 
     const router = useRouter();
 
     if (auth && auth.user) {
-      router.replace("/master/dashboard");
+      router.replace("/master/tables");
       return <Loading />;
     }
 
@@ -23,7 +23,7 @@ export const withProtected = (Component: ({}: DefaultAuthProps) => JSX.Element) 
     const router = useRouter();
 
     if (auth && !auth.user) {
-      router.replace("/login");
+      router.replace("/");
       return <Loading />;
     }
 

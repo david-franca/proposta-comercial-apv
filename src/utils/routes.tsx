@@ -9,21 +9,21 @@ const Home = chakra(IoHome);
 const StatsChart = chakra(IoStatsChart);
 
 const dashRoutes: Routes[] = [
-  {
+  /*   {
     name: "Dashboard",
     icon: <Icon as={Home} />,
     component: "dashboard",
-  },
+  }, */
   {
     name: "Indicações",
     icon: <Icon as={StatsChart} />,
     component: "tables",
   },
-  {
+  /*   {
     name: "Financeiro",
     icon: <Icon as={Card} />,
     component: "billing",
-  },
+  }, */
   {
     name: "Atendimento",
     icon: <Icon as={IoHammer} />,
