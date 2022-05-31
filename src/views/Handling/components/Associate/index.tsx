@@ -29,7 +29,6 @@ const initialValues: AssociateValues = {
   fullName: "",
   cellPhone: "",
   email: "",
-  licensePlate: "",
 };
 
 export const Associate = ({ handleIndex, handlePerson }: AssociateProps) => {
@@ -41,7 +40,6 @@ export const Associate = ({ handleIndex, handlePerson }: AssociateProps) => {
     fullName: Yup.string().required().min(2),
     cellPhone: Yup.string().matches(phoneRegExp, "Número de telefone inválido").required(),
     email: Yup.string().email().required(),
-    licensePlate: Yup.string().required(),
   });
 
   const { handleSubmit, values, touched, errors, handleChange } = useFormik({
@@ -116,18 +114,6 @@ export const Associate = ({ handleIndex, handlePerson }: AssociateProps) => {
               placeholder="Endereço de e-mail"
               isRequired
               type="email"
-            />
-            <MaskedInputField
-              mask={[/[a-zA-Z]/, /[a-zA-Z]/, /[a-zA-Z]/, "-", /\d/, /[a-zA-Z0-9]/, /\d/, /\d/]}
-              name="Placa do Veículo"
-              htmlFor="licensePlate"
-              id="licensePlate"
-              value={values.licensePlate.toUpperCase()}
-              onChange={handleChange}
-              placeholder="XXX-9999"
-              errorMessage={touched.licensePlate && errors.licensePlate}
-              isInvalid={touched.licensePlate && Boolean(errors.licensePlate)}
-              isRequired
             />
           </SimpleGrid>
           <Flex justifyContent="flex-end">

@@ -79,9 +79,12 @@ export interface FormValues {
   monthlyPayment: number;
 }
 
-type AssociateValues = Pick<FormValues, "fullName" | "cellPhone" | "email" | "licensePlate">;
+type AssociateValues = Pick<FormValues, "fullName" | "cellPhone" | "email">;
 
-type VehicleValues = Pick<FormValues, "brand" | "model" | "year" | "fipe" | "bodywork">;
+type VehicleValues = Pick<
+  FormValues,
+  "licensePlate" | "brand" | "model" | "year" | "fipe" | "bodywork"
+>;
 
 export type StatusPayment =
   | "Pending"

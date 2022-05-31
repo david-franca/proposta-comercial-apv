@@ -1,23 +1,22 @@
 import { Base } from "./Base.models";
 
 export interface VehiclesModels extends Base {
-  accession: boolean;
-  admin: number;
-  bodywork: number;
   brand: string;
-  cotas: number;
-  discount: number;
-  expiresIn: Date;
-  fipe: number;
-  inspection: boolean;
-  installation: boolean;
-  licensePlate: string;
   model: string;
+  year: number;
+  referenceMonth: string;
+  vehicleType: number;
+  fipePrice: number;
+  bodywork: number;
+  licensePlate: string;
+  discount: number;
   protected: number;
-  theft: number;
+  admin: number;
+  cotas: number;
+  monthlyPayment: number;
   total: number;
-  year: string;
+  rateio: number;
+  expiresIn: Date;
   customerId: string;
   operatorId: string;
-  monthlyPayment: number;
 }

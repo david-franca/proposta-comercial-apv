@@ -32,12 +32,6 @@ const Handling = ({ id, auth }: HandlingProps) => {
       parseDates: ["createdAt", "updatedAt", "expiresIn"],
     }
   );
-  const { add: addCustomer } = useCollection<CustomersModel>("Customers", {
-    parseDates: ["createdAt", "updatedAt", "expiresIn"],
-  });
-  const { add: addVehicle } = useCollection<VehiclesModels>("Vehicles", {
-    parseDates: ["createdAt", "updatedAt"],
-  });
 
   const [index, setIndex] = useState<number | undefined>(0);
   const [person, setPerson] = useState({} as AssociateValues);
@@ -55,6 +49,8 @@ const Handling = ({ id, auth }: HandlingProps) => {
   const handleVehicle = (vehicle: VehicleValues) => {
     setVehicle(vehicle);
   };
+
+  const handleSummary = () => {};
 
   const handleFipe = (fipe: FIPE) => {
     setFipe(fipe);
@@ -80,6 +76,7 @@ const Handling = ({ id, auth }: HandlingProps) => {
           vehicle={vehicle}
           person={person}
           fipe={fipe}
+          operator={auth.user}
         />
       </Accordion>
     </Flex>

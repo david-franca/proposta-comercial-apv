@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import { Formik, FormikErrors, FormikTouched, useFormik, useFormikContext } from "formik";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
 
@@ -24,10 +24,10 @@ import {
 } from "@chakra-ui/react";
 
 import { FIPE, FipeApi, VehicleValues } from "../../../../@types/interfaces";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { currencyToNumber, fipeAPI } from "../../../../utils";
 import { MoneyInputField } from "../MoneyInputField";
 import currency from "currency.js";
+import { MaskedInputField } from "../MaskedInputField";
 
 Yup.setLocale(ptForm);
 
@@ -43,6 +43,7 @@ const initialValues: VehicleValues = {
   year: "",
   fipe: 0,
   bodywork: 0,
+  licensePlate: "",
 };
 
 export const Vehicle = ({ handleIndex, handleVehicle, handleFipe }: VehicleProps) => {
@@ -58,6 +59,7 @@ export const Vehicle = ({ handleIndex, handleVehicle, handleFipe }: VehicleProps
     year: Yup.string().required(),
     fipe: Yup.number().required().moreThan(0),
     bodyWork: Yup.string().optional(),
+    licensePlate: Yup.string().required(),
   });
 
   const { handleSubmit, values, touched, errors, handleChange, setFieldValue } = useFormik({
@@ -254,6 +256,18 @@ export const Vehicle = ({ handleIndex, handleVehicle, handleFipe }: VehicleProps
               errorMessage={touched.bodywork && errors.bodywork}
               isInvalid={touched.bodywork && Boolean(errors.bodywork)}
               htmlFor="bodywork"
+            />
+            <MaskedInputField
+              mask={[/[a-zA-Z]/, /[a-zA-Z]/, /[a-zA-Z]/, "-", /\d/, /[a-zA-Z0-9]/, /\d/, /\d/]}
+              name="Placa do Veículo"
+              htmlFor="licensePlate"
+              id="licensePlate"
+              value={values.licensePlate.toUpperCase()}
+              onChange={handleChange}
+              placeholder="XXX-9999"
+              errorMessage={touched.licensePlate && errors.licensePlate}
+              isInvalid={touched.licensePlate && Boolean(errors.licensePlate)}
+              isRequired
             />
           </SimpleGrid>
           <Flex justifyContent="flex-end">

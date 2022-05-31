@@ -1,4 +1,6 @@
 import currency from "currency.js";
+import { User } from "firebase/auth";
+import moment from "moment";
 import NP from "number-precision";
 import { useEffect, useState } from "react";
 import { IoLogoWhatsapp } from "react-icons/io5";
@@ -14,11 +16,8 @@ import {
   Button,
   Center,
   chakra,
-  Divider,
   Flex,
   Heading,
-  Radio,
-  RadioGroup,
   SimpleGrid,
   Stack,
   Stat,
@@ -28,34 +27,23 @@ import {
 } from "@chakra-ui/react";
 
 import { AssociateValues, FIPE, VehicleValues } from "../../../../@types/interfaces";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
-import { createLink, currencyBRL } from "../../../../utils";
 import { Card, CardBody } from "../../../../components";
+import { useCollection } from "../../../../lib";
+import { CustomersModel, VehiclesModels } from "../../../../models";
+import { createLink, currencyBRL, currencyToNumber } from "../../../../utils";
 
 const CIoLogoWhatsapp = chakra(IoLogoWhatsapp);
 Yup.setLocale(ptForm);
-
-interface SummaryValues {
-  protected: number;
-  discount: number;
-  admin: number;
-  theft: number;
-  total: number;
-  accession: boolean;
-  inspection: boolean;
-  installation: boolean;
-  cotas: number;
-  monthlyPayment: number;
-}
 
 interface SummaryProps {
   handleIndex: (index: number) => void;
   vehicle: VehicleValues;
   person: AssociateValues;
   fipe: FIPE;
+  operator: User | null;
 }
 
-export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) => {
+export const Summary = ({ handleIndex, person, vehicle, fipe, operator }: SummaryProps) => {
   // Checkbox states
   const [planValue, setPlanValue] = useState("");
 
@@ -66,10 +54,62 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
   const [cotas, setCotas] = useState(0);
   const [monthlyPayment, setMonthlyPayment] = useState(0);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const { add: addCustomer, error: errorCustomer } = useCollection<CustomersModel>("Customers", {
+    parseDates: ["createdAt", "updatedAt", "expiresIn"],
+  });
+
+  const { add: addVehicle, error: errorVehicle } = useCollection<VehiclesModels>("Vehicles", {
+    parseDates: ["createdAt", "updatedAt"],
+  });
 
   const cotaValueUnity = 21.16;
 
-  const openInNewTab = (): void => {
+  const openInNewTab = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      const customerId = await addCustomer({
+        active: true,
+        createdAt: new Date(),
+        deleted: false,
+        updatedAt: new Date(),
+        ...person,
+      });
+      if (errorCustomer) {
+        throw new Error(errorCustomer);
+      }
+      await addVehicle({
+        active: true,
+        createdAt: new Date(),
+        deleted: false,
+        updatedAt: new Date(),
+        admin,
+        bodywork: vehicle.bodywork,
+        brand: fipe.brand,
+        cotas,
+        discount,
+        fipePrice: currencyToNumber(fipe.price),
+        licensePlate: vehicle.licensePlate,
+        model: fipe.model,
+        rateio,
+        monthlyPayment: currency(monthlyPayment).value,
+        protected: protectedValue,
+        total,
+        vehicleType: fipe.vehicleType,
+        year: fipe.modelYear,
+        referenceMonth: fipe.referenceMonth,
+        customerId: customerId ?? "",
+        operatorId: operator?.uid ?? "",
+        expiresIn: moment().add(5, "days").toDate(),
+      });
+      if (errorVehicle) {
+        throw new Error(errorVehicle);
+      }
+      setLoading(false);
+    } catch {
+      console.log("Erro ao salvar dados");
+    }
     const url = createLink(
       {
         admin,
@@ -95,12 +135,7 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
     let planValueRaw = "";
 
     if (protectedValue) {
-      if (protectedValue < 100000) {
-        planValueRaw = "Top";
-      }
-      if (protectedValue > 100000) {
-        planValueRaw = "Master";
-      }
+      planValueRaw = protectedValue < 100000 ? "Top" : "Master";
     }
     if (planValueRaw === "Master") {
       discountValue = 50;
@@ -144,6 +179,9 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
                 </Flex>
                 <Stack spacing={3} mb={6}>
                   <Text>
+                    Placa do Veículo: <Text as="strong">{vehicle.licensePlate}</Text>
+                  </Text>
+                  <Text>
                     Marca: <Text as="strong">{fipe.brand}</Text>
                   </Text>
                   <Text>
@@ -179,9 +217,6 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
                   <Text>
                     Email: <Text as="strong">{person.email}</Text>
                   </Text>
-                  <Text>
-                    Placa do Veículo: <Text as="strong">{person.licensePlate}</Text>
-                  </Text>
                 </Stack>
               </Box>
             </SimpleGrid>
@@ -190,7 +225,7 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
                 Plano {planValue}
               </Heading>
             </Center>
-            <SimpleGrid columns={{ sm: 1, md: 3, xl: 3 }} spacing={10}>
+            <SimpleGrid columns={{ sm: 1, md: 2, xl: 3 }} spacing={10}>
               <Stat>
                 <StatLabel>Desconto</StatLabel>
                 <StatNumber>{discount}%</StatNumber>
@@ -243,7 +278,7 @@ export const Summary = ({ handleIndex, person, vehicle, fipe }: SummaryProps) =>
                 fontSize="15px"
                 color="white"
                 fontWeight="bold"
-                // isLoading={loading}
+                isLoading={loading}
                 loadingText="Aguarde"
                 h="45"
                 mb="24px"
