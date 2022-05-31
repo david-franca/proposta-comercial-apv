@@ -80,7 +80,7 @@ const Login = ({ auth }: DefaultAuthProps) => {
 
   return (
     <ChakraProvider theme={theme} resetCSS={false}>
-      <Head title="Login" />
+      <Head title="Login | Max Caminhões" />
       <Box w="100%">
         <Flex position="relative" mb="40px">
           <Flex
