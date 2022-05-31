@@ -27,6 +27,7 @@ import {
 import authService from "../../service/auth.service";
 import { Separator } from "../Separator";
 import { useDocument } from "../../lib";
+import useAuth from "../../hooks/useAuth";
 
 Yup.setLocale(ptForm);
 
@@ -49,9 +50,7 @@ export const Configuration = (props: ConfigurationProps): JSX.Element => {
   );
   let colorButton = useColorModeValue("white", "gray.700");
   const settingsRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const { data, update } = useDocument<{ cellPhone: string; cotaValue: number }>(
-    "Configurations/default"
-  );
+  const { configurations, handleConfigurations } = useAuth();
 
   const phoneRegExp = /^\([0-9]+\)\s[0-9]+\s[0-9]+$/i;
 
@@ -64,17 +63,17 @@ export const Configuration = (props: ConfigurationProps): JSX.Element => {
     validationSchema: formSchema,
     initialValues,
     onSubmit: (values) => {
-      update(values);
+      handleConfigurations(values);
     },
   });
 
   useEffect(() => {
-    if (data) {
-      setFieldValue("cellPhone", data.cellPhone);
-      setFieldValue("cotaValue", data.cotaValue);
+    if (configurations && configurations.exists) {
+      setFieldValue("cellPhone", configurations.cellPhone);
+      setFieldValue("cotaValue", configurations.cotaValue);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [configurations]);
 
   return (
     <>
@@ -136,19 +135,6 @@ export const Configuration = (props: ConfigurationProps): JSX.Element => {
                         /\d/,
                       ]}
                     />
-                    {/* <Mask mask="(99) 99999 9999" value={values.cellPhone} onChange={handleChange}>
-                      {() => (
-                        <Input
-                          id="cellPhone"
-                          fontSize="sm"
-                          ms="4px"
-                          borderRadius="15px"
-                          type="text"
-                          placeholder="Seu telefone"
-                          size="lg"
-                        />
-                      )}
-                    </Mask> */}
                     <FormErrorMessage ms="4px">
                       {touched.cellPhone && errors.cellPhone}
                     </FormErrorMessage>
@@ -182,6 +168,9 @@ export const Configuration = (props: ConfigurationProps): JSX.Element => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    <FormErrorMessage ms="4px">
+                      {touched.cotaValue && errors.cotaValue}
+                    </FormErrorMessage>
                   </FormControl>
                 </Box>
                 <Separator />

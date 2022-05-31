@@ -1,6 +1,4 @@
-import { Base } from "./Base.models";
-
-export interface Configurations extends Base {
+export interface Configurations {
   cellPhone: string;
   cotaValue: number;
   rules: Array<string>;

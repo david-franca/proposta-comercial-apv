@@ -1,6 +1,9 @@
 import { User } from "firebase/auth";
 import { Dispatch, SetStateAction } from "react";
 
+import { Document } from "../lib";
+import { Configurations } from "../models";
+
 export interface FipeApi {
   name: string;
   code: string;
@@ -51,6 +54,12 @@ export interface AppContextInterface {
   signInWithEmailAndPassword: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: Dispatch<SetStateAction<User | null>>;
+  handleConfigurations: (data: {
+    cellPhone?: string | FieldValue | undefined;
+    cotaValue?: number | FieldValue | undefined;
+    rules?: FieldValue | (string | FieldValue | undefined)[] | undefined;
+  }) => Promise<void>;
+  configurations: Document<Configurations> | null | undefined;
 }
 
 export interface DefaultAuthProps {

@@ -46,7 +46,6 @@ export const Associate = ({ handleIndex, handlePerson }: AssociateProps) => {
     initialValues,
     validationSchema: formSchema,
     onSubmit: async (values) => {
-      console.log(values);
       handlePerson(values);
       handleIndex(1);
     },

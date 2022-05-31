@@ -2,7 +2,7 @@ import currency from "currency.js";
 import { User } from "firebase/auth";
 import moment from "moment";
 import NP from "number-precision";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IoLogoWhatsapp } from "react-icons/io5";
 import * as Yup from "yup";
 import { ptForm } from "yup-locale-pt";
@@ -31,6 +31,7 @@ import { Card, CardBody } from "../../../../components";
 import { useCollection } from "../../../../lib";
 import { CustomersModel, VehiclesModels } from "../../../../models";
 import { createLink, currencyBRL, currencyToNumber } from "../../../../utils";
+import useAuth from "../../../../hooks/useAuth";
 
 const CIoLogoWhatsapp = chakra(IoLogoWhatsapp);
 Yup.setLocale(ptForm);
@@ -55,6 +56,7 @@ export const Summary = ({ handleIndex, person, vehicle, fipe, operator }: Summar
   const [monthlyPayment, setMonthlyPayment] = useState(0);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const { configurations } = useAuth();
 
   const { add: addCustomer, error: errorCustomer } = useCollection<CustomersModel>("Customers", {
     parseDates: ["createdAt", "updatedAt", "expiresIn"],
@@ -64,7 +66,10 @@ export const Summary = ({ handleIndex, person, vehicle, fipe, operator }: Summar
     parseDates: ["createdAt", "updatedAt"],
   });
 
-  const cotaValueUnity = 21.16;
+  const cotaValueUnity = useMemo(
+    () => (configurations && configurations.exists ? configurations.cotaValue : 0),
+    [configurations]
+  );
 
   const openInNewTab = async (): Promise<void> => {
     setLoading(true);
@@ -155,7 +160,7 @@ export const Summary = ({ handleIndex, person, vehicle, fipe, operator }: Summar
     setProtectedValue(protectedValue);
     setRateio(rateioValue);
     setMonthlyPayment(adminValue + 200 + (planValueRaw === "10" ? rateioValue / 2 : rateioValue));
-  }, [vehicle]);
+  }, [cotaValueUnity, vehicle]);
 
   return (
     <AccordionItem>

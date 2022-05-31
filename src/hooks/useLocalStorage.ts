@@ -14,7 +14,6 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       }
     } catch (error) {
       // If error also return initialValue
-      console.log(error);
       return initialValue;
     }
   });
