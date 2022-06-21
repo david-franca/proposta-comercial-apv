@@ -56,7 +56,7 @@ export const HeaderLinks = (props: HeaderLinksProp) => {
       alignItems="center"
       flexDirection="row"
     >
-      <InputGroup
+      {/* <InputGroup
         cursor="pointer"
         bg={inputBg}
         borderRadius="15px"
@@ -94,19 +94,7 @@ export const HeaderLinks = (props: HeaderLinksProp) => {
           placeholder="Digite aqui..."
           borderRadius="inherit"
         />
-      </InputGroup>
-      {/* <Link href="/login">
-        <Button
-          ms="0px"
-          px="0px"
-          me={{ sm: "2px", md: "16px" }}
-          color={navbarIcon}
-          variant="transparent-with-icon"
-          leftIcon={<Icon as={IoPerson} color={navbarIcon} w="22px" h="22px" me="0px" />}
-        >
-          <Text display={{ sm: "none", md: "flex" }}>Sign In</Text>
-        </Button>
-      </Link> */}
+      </InputGroup> */}
       <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="" />
       <Icon
         as={IoSettings}
