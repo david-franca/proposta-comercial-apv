@@ -44,7 +44,6 @@ export const Container = ({ name, children, select }: ContainerProps) => {
         <PanelContent>
           <PanelContainer>{children}</PanelContainer>
         </PanelContent>
-        <Footer />
         <Configuration isOpen={isOpen} onClose={onClose} />
       </MainPanel>
     </ChakraProvider>

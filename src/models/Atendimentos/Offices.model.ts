@@ -1,4 +1,4 @@
-import { Base } from "./Base.models";
+import { Base } from "../Base.models";
 
 export interface Offices extends Base {
   name: string;
