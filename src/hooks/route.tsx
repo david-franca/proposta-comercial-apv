@@ -9,7 +9,7 @@ export const withPublic = (Component: ({}: DefaultAuthProps) => JSX.Element) => 
     const router = useRouter();
 
     if (auth && auth.user) {
-      router.replace("/master/tables");
+      // router.replace("/master/tables");
       return <Loading />;
     }
 

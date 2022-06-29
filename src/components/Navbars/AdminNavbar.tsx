@@ -115,20 +115,6 @@ export const AdminNavbar = (props: AdminNavbarProp) => {
         alignItems={{ xl: "center" }}
       >
         <Box mb={{ sm: "8px", md: "0px" }}>
-          {/* <Breadcrumb>
-            <BreadcrumbItem color={mainText}>
-              <NextLink href="/master/dashboard" passHref>
-                <BreadcrumbLink color={secondaryText}>Admin</BreadcrumbLink>
-              </NextLink>
-            </BreadcrumbItem>
-
-            <BreadcrumbItem color={mainText} isCurrentPage>
-              <BreadcrumbLink href="#" color={mainText}>
-                {brandText}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </Breadcrumb> */}
-          {/* Here we create navbar brand, based on route name */}
           <NextLink href="#" passHref>
             <Link
               color={mainText}

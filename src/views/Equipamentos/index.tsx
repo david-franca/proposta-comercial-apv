@@ -88,8 +88,8 @@ const Equipamentos = () => {
       return (
         <List>
           <ListItem>Tipo: {lastHistoryAction.type}</ListItem>
-          <ListItem>Titular: {lastHistoryAction.bearer}</ListItem>
-          <ListItem>Escritório: {lastHistoryAction.office}</ListItem>
+          <ListItem>Titular: {lastHistoryAction.bearerId}</ListItem>
+          <ListItem>Escritório: {lastHistoryAction.officeId}</ListItem>
           <ListItem>Data do Evento: {moment(new Date(lastHistoryAction.date)).calendar()}</ListItem>
         </List>
       );

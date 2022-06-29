@@ -16,11 +16,10 @@ interface Routes {
 }
 
 interface SidebarProps {
-  routes: Array<Routes>;
   selected: string;
 }
 
-export const Sidebar = ({ routes, selected }: SidebarProps) => {
+export const Sidebar = ({ selected }: SidebarProps) => {
   const mainPanel = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   let variantChange = "0.2s linear";
@@ -51,12 +50,7 @@ export const Sidebar = ({ routes, selected }: SidebarProps) => {
           m={sidebarMargins}
           borderRadius={sidebarRadius}
         >
-          <SidebarContent
-            routes={routes}
-            selected={selected}
-            variantChange={variantChange}
-            logoText=""
-          />
+          <SidebarContent selected={selected} variantChange={variantChange} logoText="" />
         </Box>
       </Box>
     </Box>

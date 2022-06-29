@@ -1,7 +1,7 @@
-import { DefaultAuthProps } from "../../@types/interfaces";
-import { Container } from "../../components";
-import { withProtected } from "../../hooks/route";
-import DashboardView from "../../views/Dashboard";
+import { DefaultAuthProps } from "../@types/interfaces";
+import { Container } from "../components";
+import { withProtected } from "../hooks/route";
+import DashboardView from "../views/Dashboard";
 
 const Dashboard = ({ auth }: DefaultAuthProps) => {
   return (

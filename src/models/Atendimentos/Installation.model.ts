@@ -3,6 +3,6 @@ type InstallationType = "Instalação" | "Remoção" | "Recuperação" | "Manute
 export interface Installation {
   type: InstallationType;
   date: string;
-  bearer: string;
-  office: string;
+  bearerId: string;
+  officeId: string;
 }

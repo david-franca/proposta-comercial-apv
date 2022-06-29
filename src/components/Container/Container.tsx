@@ -3,7 +3,6 @@ import { PropsWithChildren } from "react";
 import { ChakraProvider, Portal, useDisclosure } from "@chakra-ui/react";
 
 import theme from "../../theme/theme";
-import route from "../../utils/routes";
 import { Configuration } from "../Configuration";
 import { Footer } from "../Footer";
 import { Head } from "../Head";
@@ -24,7 +23,7 @@ export const Container = ({ name, children, select }: ContainerProps) => {
   return (
     <ChakraProvider theme={theme} resetCSS={false}>
       <Head title={`${name} | MAX Caminhões`} />
-      <Sidebar routes={route} selected={select} />
+      <Sidebar selected={select} />
       <MainPanel
         w={{
           base: "100%",

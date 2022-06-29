@@ -1,6 +1,6 @@
-import { Container } from "../../components";
-import { withProtected } from "../../hooks/route";
-import TablesView from "../../views/Tables";
+import { Container } from "../components";
+import { withProtected } from "../hooks/route";
+import TablesView from "../views/Tables";
 
 const Tables = () => {
   return (

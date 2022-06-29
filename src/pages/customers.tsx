@@ -1,6 +1,6 @@
-import { Container } from "../../components";
-import { withProtected } from "../../hooks/route";
-import CustomersView from "../../views/Customers";
+import { Container } from "../components";
+import { withProtected } from "../hooks/route";
+import CustomersView from "../views/Customers";
 
 const Customers = () => {
   return (

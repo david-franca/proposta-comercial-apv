@@ -14,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 
 import { Routes } from "../../@types/interfaces";
-import dashRoutes from "../../utils/routes";
 import { SidebarResponsive } from "../Sidebar/SidebarResponsive";
 
 interface HeaderLinksProp {
@@ -95,7 +94,7 @@ export const HeaderLinks = (props: HeaderLinksProp) => {
           borderRadius="inherit"
         />
       </InputGroup> */}
-      <SidebarResponsive routes={dashRoutes} selected={selected} {...rest} logoText="" />
+      <SidebarResponsive selected={selected} {...rest} logoText="" />
       <Icon
         as={IoSettings}
         id="settings"

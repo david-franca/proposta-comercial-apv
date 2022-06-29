@@ -1,33 +1,60 @@
-import { IoCard, IoHammer, IoHome, IoStatsChart } from "react-icons/io5";
+import { chakra, Icon } from "@chakra-ui/react";
+import {
+  IoBarbell,
+  IoBuild,
+  IoBusiness,
+  IoFileTrayStacked,
+  IoHammer,
+  IoIdCard,
+  IoStatsChart,
+} from "react-icons/io5";
 
-import { chakra, Flex, Icon, Spinner } from "@chakra-ui/react";
-
-import { Routes } from "../@types/interfaces";
-
-const Card = chakra(IoCard);
-const Home = chakra(IoHome);
 const StatsChart = chakra(IoStatsChart);
+const Hammer = chakra(IoHammer);
+const Barbell = chakra(IoBarbell);
+const Business = chakra(IoBusiness);
+const Build = chakra(IoBuild);
+const FileTrayStacked = chakra(IoFileTrayStacked);
 
-const dashRoutes: Routes[] = [
-  /*   {
-    name: "Dashboard",
-    icon: <Icon as={Home} />,
-    component: "dashboard",
-  }, */
+interface Rotas {
+  label: string;
+  views: { name: string; icon: JSX.Element; component: string }[];
+}
+
+export const routes: Rotas[] = [
   {
-    name: "Indicações",
-    icon: <Icon as={StatsChart} />,
-    component: "tables",
+    label: "Master",
+    views: [
+      {
+        name: "Indicações",
+        icon: <Icon as={StatsChart} />,
+        component: "tables",
+      },
+      {
+        name: "Atendimento",
+        icon: <Icon as={Hammer} />,
+        component: "handling",
+      },
+    ],
   },
-  /*   {
-    name: "Financeiro",
-    icon: <Icon as={Card} />,
-    component: "billing",
-  }, */
   {
-    name: "Atendimento",
-    icon: <Icon as={IoHammer} />,
-    component: "handling",
+    label: "Suporte",
+    views: [
+      {
+        name: "Equipamentos",
+        component: "equipamentos",
+        icon: <Icon as={Barbell} />,
+      },
+      {
+        name: "Apoio",
+        component: "staff",
+        icon: <Icon as={Business} />,
+      },
+      {
+        name: "Estoque",
+        component: "inventory",
+        icon: <Icon as={FileTrayStacked} />,
+      },
+    ],
   },
 ];
-export default dashRoutes;

@@ -34,6 +34,7 @@ export interface Routes {
   icon?: JSX.Element;
   component: string;
   layout?: string;
+  views?: Routes[];
 }
 
 export type Status = "Iniciado" | "Aprovado" | "Cancelado" | "Expirado" | "Aguardando";

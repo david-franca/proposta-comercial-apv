@@ -1,9 +1,10 @@
-import NextLink from "next/link";
-import { useRouter } from "next/router";
-import { useRef } from "react";
-
 import { HamburgerIcon } from "@chakra-ui/icons";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Drawer,
@@ -19,123 +20,118 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import { useRef } from "react";
 import { Routes } from "../../@types/interfaces";
+import { routes as rotas } from "../../utils/routes";
 import { IconBox } from "../Icons/IconBox";
 import { Separator } from "../Separator";
 
 interface SidebarProps {
-  routes: Array<Routes>;
   selected: string;
   logoText: string;
 }
 
-export const SidebarResponsive = ({ selected, routes, logoText }: SidebarProps) => {
+export const SidebarResponsive = ({ selected, logoText }: SidebarProps) => {
   const router = useRouter();
 
   let variantChange = "0.2s linear";
 
-  const swithPage = (page: string) => {
+  const switchPage = (page: string) => {
     router.push(`${page}`);
   };
 
-  const useCreateLinks = (routes: Routes[]) => {
+  const useCreateLinks = (routes: any[]) => {
     // Chakra Color Mode
     const activeBg = useColorModeValue("white", "gray.700");
     const inactiveBg = useColorModeValue("white", "gray.700");
     const activeColor = useColorModeValue("gray.700", "white");
     const inactiveColor = useColorModeValue("gray.400", "gray.400");
+    const sidebarActiveShadow = "none";
 
-    return routes.map((route, index) => {
-      if (route.component === selected) {
-        // selected(route);
-        return (
-          <NextLink passHref href={`/master/${route.component}`} key={index}>
-            <Button
-              onClick={() => swithPage(route.component)}
-              boxSize="initial"
-              justifyContent="flex-start"
-              alignItems="center"
-              bg={activeBg}
-              mb={{
-                xl: "12px",
-              }}
-              mx={{
-                xl: "auto",
-              }}
-              ps={{
-                sm: "10px",
-                xl: "16px",
-              }}
-              py="12px"
-              borderRadius="15px"
-              w="100%"
-              _active={{
-                bg: "inherit",
-                transform: "none",
-                borderColor: "transparent",
-              }}
-              _focus={{
-                boxShadow: "none",
-              }}
-            >
-              <Flex>
-                <IconBox bg="teal.300" color="white" h="30px" w="30px" me="12px">
-                  {route.icon}
-                </IconBox>
-                <Text color={activeColor} my="auto" fontSize="sm">
-                  {route.name}
-                </Text>
-              </Flex>
-            </Button>
-          </NextLink>
-        );
-      }
-      return (
-        <NextLink passHref href={`/master/${route.component}`} key={index}>
-          <Button
-            onClick={() => swithPage(route.component)}
-            boxSize="initial"
-            justifyContent="flex-start"
-            alignItems="center"
-            bg="transparent"
-            mb={{
-              xl: "12px",
-            }}
-            mx={{
-              xl: "auto",
-            }}
-            py="12px"
-            ps={{
-              sm: "10px",
-              xl: "16px",
-            }}
-            borderRadius="15px"
-            w="100%"
-            _active={{
-              bg: "inherit",
-              transform: "none",
-              borderColor: "transparent",
-            }}
-            _focus={{
-              boxShadow: "none",
-            }}
-          >
-            <Flex>
-              <IconBox bg={inactiveBg} color="teal.300" h="30px" w="30px" me="12px">
-                {route.icon}
-              </IconBox>
-              <Text color={inactiveColor} my="auto" fontSize="sm">
-                {route.name}
-              </Text>
-            </Flex>
-          </Button>
-        </NextLink>
-      );
-    });
+    return (
+      <Accordion defaultIndex={[0]} allowMultiple>
+        {rotas.map((rota, index) => (
+          <AccordionItem key={index}>
+            <h2>
+              <AccordionButton>
+                <Box flex={1} textAlign="left">
+                  {rota.label}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              {rota.views.map((view) => {
+                const isSelected = view.component === selected;
+                return (
+                  <NextLink
+                    passHref
+                    href={`/${rota.label.toLowerCase()}/${view.component}`}
+                    key={index}
+                  >
+                    <Button
+                      onClick={() => switchPage(view.component)}
+                      boxSize="initial"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      bg={isSelected ? activeBg : "transparent"}
+                      boxShadow={isSelected ? sidebarActiveShadow : ""}
+                      transition={variantChange}
+                      mb={{
+                        xl: "12px",
+                      }}
+                      mx={{
+                        xl: "auto",
+                      }}
+                      ps={{
+                        sm: "10px",
+                        xl: "16px",
+                      }}
+                      py="12px"
+                      borderRadius="15px"
+                      w="100%"
+                      _active={{
+                        bg: "inherit",
+                        transform: "none",
+                        borderColor: "transparent",
+                      }}
+                      _focus={{
+                        boxShadow: isSelected ? "0px 7px 11px rgba(0, 0, 0, 0.04)" : "none",
+                      }}
+                    >
+                      <Flex>
+                        <IconBox
+                          bg={isSelected ? "teal.300" : inactiveBg}
+                          color={isSelected ? "white" : "teal.300"}
+                          h="30px"
+                          w="30px"
+                          me="12px"
+                          transition={variantChange}
+                        >
+                          {view.icon}
+                        </IconBox>
+                        <Text
+                          color={isSelected ? activeColor : inactiveColor}
+                          my="auto"
+                          fontSize="sm"
+                        >
+                          {view.name}
+                        </Text>
+                      </Flex>
+                    </Button>
+                  </NextLink>
+                );
+              })}
+            </AccordionPanel>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    );
   };
 
-  const links = <>{useCreateLinks(routes)}</>;
+  const links = <>{useCreateLinks(rotas)}</>;
 
   const mainText = useColorModeValue("gray.700", "gray.200");
   let hamburgerColor = useColorModeValue("gray.500", "gray.200");
