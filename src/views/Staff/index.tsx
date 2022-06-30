@@ -11,11 +11,20 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 
 import { Card, CardBody } from "../../components";
+import { useCollection } from "../../lib";
+import { Bearer } from "../../models/Atendimentos/Bearer.model";
 
 export const Staff = () => {
+  const [technical, setTechnical] = useState([]);
+  const [offices, setOffices] = useState([]);
+  const { data: staffCollection } = useCollection<Bearer>("Staff", {
+    parseDates: ["createdAt"],
+    listen: true,
+  });
+
   return (
     <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
       <Card overflowX={{ sm: "scroll", xl: "hidden" }}>
